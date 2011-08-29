@@ -64,7 +64,10 @@ class StorageManager(object):
                                  "Protocol +: (?P<protocol>[^\n]+)\n +"
                                  "Drive Type +: (?P<drivetype>[^\n]+)\n"
                                  , tmp):
-                print m.groupdict()
+                m = m.groupdict()
+                for k in m.keys():
+                    m[k] = m[k].strip()
+                print m
             
                                 
 
