@@ -32,11 +32,11 @@ class StorageManager(object):
         # First, get Ctrl
         tmp = run(sas2ircu, "LIST")
         tmp = re.findall("(\n +[0-9]+ +.*)", tmp)
-        print tmp
         for ctrl in tmp:
             m = re.match(" +(?P<index>[0-9]) +(?P<adaptertype>[^ ].*[^ ]) +(?P<vendorid>[^ ]+) +"
                          "(?P<deviceid>[^ ]+) +(?P<pciadress>[^ ]*:[^ ]*) +(?P<subsysvenid>[^ ]+)"
                          "+(?P<subsysdevid>[^ ]+) *", ctrl)
+            print m
             if m:
                 ctrl = m.groupdict()
                 ctrl["index"] = int(ctrl["index"])
