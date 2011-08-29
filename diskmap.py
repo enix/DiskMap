@@ -71,10 +71,33 @@ class SesManager(object):
                 m["controller"] = ctrl
                 self.disks[m["serial"]] = m
 
+    def discover_mapping(self):
+        """ use prtconf to get real device name using disk serial """
+        prtconf = run("/usr/bin/prtconf", "-v")
+        # Do some ugly magic to get what we want
+        # First, get one line per drive
+        prtconf = prtconf.replace("\n", "").replace("disk, instance", "\n")
+        # Then match with regex
+        tmp = re.findall("name='inquiry-serial-no' type=string items=1 dev=none +value='([^']+)'"
+                         ".*?"
+                         "name='client-guid' type=string items=1 *value='([^']+)'", prtconf)
+        # Capitalize everything.
+        tmp = [ (a.upper(), b.upper()) for a, b in tmp ]
+        tmp = dict(tmp)
+        # Sometimes serial returned by prtconf and by sas2ircu are different. Mangle them
+        for serial, device in tmp.items()[:]:
+            serial = serial.replace("WD-", "WD")
+            if serial in self.disks:
+                self.disks[serial]["device"] = "/dev/rdsk/c1t%sd0"%device
+            print "Warning : Got this serial (%s), but can't find it in disk detected by sas2ircu"%serial
+            
+            
+
     def discover(self):
         """ use sas2ircu to populate controller, enclosures ands disks """
         self.discover_controllers()
         self.discover_enclosures()
+        self.discover_mapping()
         
     def __str__(self):
         from pprint import pformat
