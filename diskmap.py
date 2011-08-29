@@ -14,7 +14,7 @@ def run(cmd, *args):
 def cleandict(mydict, *toint):
     result = {}
     for k in mydict.keys():
-        result[k] = long(mydict[k]) if k in toint else mydict[k]
+        result[k] = long(mydict[k]) if k in toint else mydict[k].strip()
     return result
 
 class Disk(object):
