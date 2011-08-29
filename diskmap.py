@@ -34,7 +34,7 @@ class StorageManager(object):
         tmp = re.findall("(\n +[0-9]+ +.*)", tmp)
         for ctrl in tmp:
             ctrl = ctrl.strip()
-            m = re.match(" +(?P<index>[0-9]) +(?P<adaptertype>[^ ].*[^ ]) +(?P<vendorid>[^ ]+) +"
+            m = re.match("(?P<index>[0-9]) +(?P<adaptertype>[^ ].*[^ ]) +(?P<vendorid>[^ ]+) +"
                          "(?P<deviceid>[^ ]+) +(?P<pciadress>[^ ]*:[^ ]*) +(?P<subsysvenid>[^ ]+) +"
                          "(?P<subsysdevid>[^ ]+) *", ctrl)
             print ctrl
