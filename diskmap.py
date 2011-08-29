@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import subprocess, re, os, sys
+import subprocess, re, os, sys, readline, Cmd
 
 
 sas2ircu = "/usr/sbin/sas2ircu"
@@ -18,8 +18,9 @@ def cleandict(mydict, *toint):
     return result
 
 
-class SesManager(object):
-    def __init__(self):
+class SesManager(Cmd):
+    def __init__(self, *l, **kv):
+        super(self, SesManager).__init__(self, *l, **kv)
         self.enclosures = {}
         self.controllers = {}
         self.disks = {}
@@ -84,18 +85,18 @@ class SesManager(object):
         # Capitalize everything.
         tmp = [ (a.upper(), b.upper()) for a, b in tmp ]
         tmp = dict(tmp)
-        print self.disks
-        print tmp
         # Sometimes serial returned by prtconf and by sas2ircu are different. Mangle them
         for serial, device in tmp.items()[:]:
             serial = serial.strip()
             serial = serial.replace("WD-", "WD")
+            device = "/dev/rdsk/c1t%sd0"%device
             if serial in self.disks:
-                self.disks[serial]["device"] = "/dev/rdsk/c1t%sd0"%device
+                # Add device name to disks
+                self.disks[serial]["device"] = device
+                # Add a reverse lookup
+                self.disks[device] = self.disks[serial]
             else:
                 print "Warning : Got this serial (%s), but can't find it in disk detected by sas2ircu"%serial
-            
-            
 
     def discover(self):
         """ use sas2ircu to populate controller, enclosures ands disks """
@@ -112,6 +113,8 @@ class SesManager(object):
             result.append(pformat(getattr(self,i)))
             result.append("")
         return "\n".join(result)
+
+
 
 if __name__ == "__main__":
     if not os.path.isfile(sas2ircu):
