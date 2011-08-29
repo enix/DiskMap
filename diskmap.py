@@ -42,7 +42,7 @@ class StorageManager(object):
     def discover_enclosure(self, *ctrls):
         """ Discover enclosure wired to controller. If no controller specified, discover them all """
         if not ctrls:
-            ctrls = self.controller.index()
+            ctrls = self.controller.keys()
         for ctrl in ctrls:
             tmp = run(sas2ircu, ctrl, "DISPLAY")
             for m in re.finditer("Enclosure# +: (?P<enclosureid>[^ ]+)\n +"
