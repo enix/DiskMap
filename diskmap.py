@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
-import subprocess, re, os, sys, readline, cmd
+import subprocess, re, os, sys, readline, cmd, pickle
 
+cachefile = "/tmp/pouet"
 
 sas2ircu = "/usr/sbin/sas2ircu"
 prtconf = "/usr/sbin/prtconf"
@@ -109,9 +110,14 @@ class SesManager(cmd.Cmd):
         self.discover_enclosures()
         self.discover_mapping()
 
-    def do_save(self):
-        """Save discovered topology to"""
-        pass
+    def do_save(self, line):
+        """Save data to cache file"""
+        pickle.dump((self.controllers, self.enclosures, self.disks), cachefile)
+
+
+    def do_load(self, line):
+        """Load data from cache file"""
+        self.controllers, self.enclosures, self.disks = pickle.load(cachefile)
         
     def __str__(self):
         from pprint import pformat
