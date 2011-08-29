@@ -3,7 +3,8 @@
 import subprocess, re, os, sys
 
 def run(cmd, *args):
-    return subprocess.Popen([cmd] + args, stdout=subprocess.PIPE).communicate()[0]
+    return subprocess.Popen(tuple([cmd] + args),
+                            stdout=subprocess.PIPE).communicate()[0]
           
 
 sas2ircu = "/usr/sbin/sas2ircu"
