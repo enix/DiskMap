@@ -73,14 +73,14 @@ class SesManager(object):
 
     def discover_mapping(self):
         """ use prtconf to get real device name using disk serial """
-        prtconf = run(prtconf, "-v")
+        tmp = run(prtconf, "-v")
         # Do some ugly magic to get what we want
         # First, get one line per drive
-        prtconf = prtconf.replace("\n", "").replace("disk, instance", "\n")
+        tmp = prtconf.replace("\n", "").replace("disk, instance", "\n")
         # Then match with regex
         tmp = re.findall("name='inquiry-serial-no' type=string items=1 dev=none +value='([^']+)'"
                          ".*?"
-                         "name='client-guid' type=string items=1 *value='([^']+)'", prtconf)
+                         "name='client-guid' type=string items=1 *value='([^']+)'", tmp)
         # Capitalize everything.
         tmp = [ (a.upper(), b.upper()) for a, b in tmp ]
         tmp = dict(tmp)
