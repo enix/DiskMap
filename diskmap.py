@@ -51,6 +51,7 @@ class SesManager(object):
                                  "Numslots +: (?P<numslot>[0-9]+)", tmp):
                 m = cleandict(m.groupdict(), "index", "numslot")
                 m["controller"] = ctrl
+                self.enclosures[m["id"]] = m
                 enclosures[m["index"]] = m
             # Discover Drives
             for m in re.finditer("Device is a Hard disk\n +"
@@ -69,8 +70,6 @@ class SesManager(object):
                 m["enclosure"] = enclosures[m["enclosureindex"]]["id"]
                 m["controller"] = ctrl
                 self.disks[m["serial"]] = m
-            
-                                
 
     def discover(self):
         """ use sas2ircu to populate controller, enclosures ands disks """
