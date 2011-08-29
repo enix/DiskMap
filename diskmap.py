@@ -103,6 +103,7 @@ class SesManager(cmd.Cmd):
     def do_quit(self, line):
         "Quit"
         sys.exit()
+    do_EOF = do_quit
         
     def do_discover(self, line=""):
         """Perform discovery on host to populate controller, enclosures and disks """
