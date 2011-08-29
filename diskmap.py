@@ -42,6 +42,7 @@ class SesManager(object):
         if not ctrls:
             ctrls = self.controllers.keys()
         for ctrl in ctrls:
+            print ctrl
             tmp = run(sas2ircu, ctrl["index"], "DISPLAY")
             #tmp = file("/tmp/pouet.txt").read() # Test with Wraith__ setup
             enclosures = {}
