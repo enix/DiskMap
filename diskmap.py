@@ -51,7 +51,7 @@ class StorageManager(object):
         result.append("Enclosures")
         result.append("="*80)
         result.append(pformat(self.enclosures))
-        return result
+        return "\n".join(result)
 
 if __name__ == "__main__":
     if not os.path.isfile(sas2ircu):
