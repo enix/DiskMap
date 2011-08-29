@@ -56,13 +56,13 @@ class StorageManager(object):
                                  "Enclosure # +: (?P<enclosure>[^\n]+)\n +"
                                  "Slot # +: (?P<slot>[^\n]+)\n +"
                                  "State +: (?P<state>[^\n]+)\n +"
-#                                 "Size .in MB./.in sectors. +: (?P<sizemb>[^/]+)/(?P<sizesector>[^\n]+)\n +"
-#                                 "Manufacturer +: (?P<manufacturer>[^\n]+)\n +"
-#                                 "Model Number +: (?P<model>[^\n]+)\n +"
-#                                 "Firmware Revision +: (?P<firmware>[^\n]+)\n +"
-#                                 "Serial No +: (?P<serial>[^\n]+)\n +"
-#                                 "Protocol +: (?P<protocol>[^\n]+)\n +"
-#                                 "Drive Type +: (?P<drivetype>[^\n]+)\n"
+                                 "Size .in MB./.in sectors. +: (?P<sizemb>[^/]+)/(?P<sizesector>[^\n]+)\n +"
+                                 "Manufacturer +: (?P<manufacturer>[^\n]+)\n +"
+                                 "Model Number +: (?P<model>[^\n]+)\n +"
+                                 "Firmware Revision +: (?P<firmware>[^\n]+)\n +"
+                                 "Serial No +: (?P<serial>[^\n]+)\n +"
+                                 "Protocol +: (?P<protocol>[^\n]+)\n +"
+                                 "Drive Type +: (?P<drivetype>[^\n]+)\n"
                                  , tmp):
                 print m.groupdict()
             
