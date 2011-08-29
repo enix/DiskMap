@@ -34,7 +34,7 @@ class SesManager(object):
                          "(?P<deviceid>[^ ]+) +(?P<pciadress>[^ ]*:[^ ]*) +(?P<subsysvenid>[^ ]+) +"
                          "(?P<subsysdevid>[^ ]+) *", ctrl)
             if m:
-                m = cleandict(m.groupdict(), "index")
+                m = cleandict(m.groupdict(), "id")
                 self.controllers[m["id"]] = m
 
     def discover_enclosures(self, *ctrls):
@@ -52,7 +52,6 @@ class SesManager(object):
                 m = cleandict(m.groupdict(), "index", "numslot")
                 m["controller"] = ctrl
                 enclosures[m["index"]] = m
-            print enclosures
             # Discover Drives
             for m in re.finditer("Device is a Hard disk\n +"
                                  "Enclosure # +: (?P<enclosureindex>[^\n]+)\n +"
@@ -66,7 +65,7 @@ class SesManager(object):
                                  "Protocol +: (?P<protocol>[^\n]+)\n +"
                                  "Drive Type +: (?P<drivetype>[^\n]+)\n"
                                  , tmp):
-                m = cleandict(m.groupdict(), "enclosure", "slot", "sizemb", "sizesector")
+                m = cleandict(m.groupdict(), "enclosureindex", "slot", "sizemb", "sizesector")
                 m["enclosure"] = enclosures[m["enclosureindex"]]["id"]
                 m["controller"] = ctrl
                 self.disks[m["serial"]] = m
