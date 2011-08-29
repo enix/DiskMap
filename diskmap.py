@@ -99,7 +99,7 @@ class SesManager(cmd.Cmd):
                 print "Warning : Got the serial %s from prtconf, but can't find it in disk detected by sas2ircu (disk removed ?)"%serial
 
 
-    def do_quit(self):
+    def do_quit(self, line):
         "Quit"
         sys.exit()
         
