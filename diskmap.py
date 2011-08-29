@@ -37,14 +37,12 @@ class StorageManager(object):
             m = re.match("(?P<index>[0-9]) +(?P<adaptertype>[^ ].*[^ ]) +(?P<vendorid>[^ ]+) +"
                          "(?P<deviceid>[^ ]+) +(?P<pciadress>[^ ]*:[^ ]*) +(?P<subsysvenid>[^ ]+) +"
                          "(?P<subsysdevid>[^ ]+) *", ctrl)
-            print ctrl
-            print m
             if m:
                 ctrl = m.groupdict()
                 ctrl["index"] = int(ctrl["index"])
                 self.controller[ctrl["index"]] = ctrl
 
-    def __repr__(self):
+    def __str__(self):
         from pprint import pformat
         result = [ "Controller" ]
         result.append("="*80)
@@ -53,12 +51,13 @@ class StorageManager(object):
         result.append("Enclosures")
         result.append("="*80)
         result.append(pformat(self.enclosures))
+        return result
 
 if __name__ == "__main__":
     if not os.path.isfile(sas2ircu):
         sys.exit("Error, cannot find sas2ircu (%s)"%sas2ircu)
     st = StorageManager()
     st.populate()
-    print st.__repr__()
+    print st
     
     
