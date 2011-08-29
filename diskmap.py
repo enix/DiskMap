@@ -77,6 +77,7 @@ class SesManager(object):
         # Do some ugly magic to get what we want
         # First, get one line per drive
         tmp = prtconf.replace("\n", "").replace("disk, instance", "\n")
+        print tmp
         # Then match with regex
         tmp = re.findall("name='inquiry-serial-no' type=string items=1 dev=none +value='([^']+)'"
                          ".*?"
@@ -85,7 +86,6 @@ class SesManager(object):
         tmp = [ (a.upper(), b.upper()) for a, b in tmp ]
         tmp = dict(tmp)
         # Sometimes serial returned by prtconf and by sas2ircu are different. Mangle them
-        print tmp
         for serial, device in tmp.items()[:]:
             serial = serial.replace("WD-", "WD")
             if serial in self.disks:
