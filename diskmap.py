@@ -52,7 +52,7 @@ class StorageManager(object):
             ctrls = self.controllers.keys()
         for ctrl in ctrls:
             #tmp = run(sas2ircu, ctrl, "DISPLAY")
-            tmp = file("/tmp/pouet.txt".read())
+            tmp = file("/tmp/pouet.txt").read()
             for m in re.finditer("Enclosure# +: (?P<index>[^ ]+)\n +"
                                  "Logical ID +: (?P<logicalid>[^ ]+)\n +"
                                  "Numslots +: (?P<numslot>[0-9]+)", tmp):
