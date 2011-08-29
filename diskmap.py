@@ -19,15 +19,15 @@ def cleandict(mydict, *toint):
         result[k] = long(mydict[k]) if k in toint else mydict[k].strip()
     return result
 
-def megabyze(i):
+def megabyze(i, fact=1000):
     """
     Return the size in Kilo, Mega, Giga, Tera, Peta according to the input.
     """
     i = float(i)
     for unit in "", "K", "M", "G", "T", "P":
         if i < 2000: break
-        i = i / 1024
-        return "%.1f%s"%(i, unit)
+        i = i / fact
+    return "%.1f%s"%(i, unit)
 
 class SesManager(cmd.Cmd):
     def __init__(self, *l, **kv):
@@ -35,6 +35,7 @@ class SesManager(cmd.Cmd):
         self.enclosures = {}
         self.controllers = {}
         self.disks = {}
+        self.prompt = "Diskmap> "
 
     def discover_controllers(self):
         """ Discover controller present in the computer """
@@ -109,10 +110,20 @@ class SesManager(cmd.Cmd):
             else:
                 print "Warning : Got the serial %s from prtconf, but can't find it in disk detected by sas2ircu (disk removed ?)"%serial
 
+    def preloop(self):
+        if os.path.exists(cachefile):
+            self.do_load("")
+        else:
+            self.do_discover("")
+            self.do_save("")
+
+    def postloop(self):
+        if self.disks:
+            self.do_save("")
 
     def do_quit(self, line):
         "Quit"
-        sys.exit()
+        return True
     do_EOF = do_quit
         
     def do_discover(self, line=""):
@@ -139,15 +150,18 @@ class SesManager(cmd.Cmd):
         pprint(self.controllers)
 
     def do_disks(self, line):
-        """Display detected disks """
-        list = [ ("%2d:%.2d:%.2d"%(v["controller"], v["enclosureindex"], v["slot"]), v)
+        """Display detected disks. Use -v for verbose output"""
+        list = [ ("%1d:%.2d:%.2d"%(v["controller"], v["enclosureindex"], v["slot"]), v)
                  for k,v in self.disks.items() if k.startswith("/dev/rdsk") ]
         list.sort()
+        if line == "-v":
+            pprint (list)
+            return
         for path, disk in list:
             disk["path"] = path
             disk["device"] = disk["device"].replace("/dev/rdsk/", "")
             disk["readablesize"] = megabyze(disk["sizemb"]*1024*1024)
-            print "%(path)s  %23(device)s  %16(model)s  %.2(readablesize)f  %(state)s"%disk
+            print "%(path)s  %(device)23s  %(model)16s  %(readablesize)6s  %(state)s"%disk
         
     def __str__(self):
         result = []
@@ -161,8 +175,8 @@ class SesManager(cmd.Cmd):
 
 
 if __name__ == "__main__":
-    if not os.path.isfile(sas2ircu):
-        sys.exit("Error, cannot find sas2ircu (%s)"%sas2ircu)
+    #if not os.path.isfile(sas2ircu):
+    #    sys.exit("Error, cannot find sas2ircu (%s)"%sas2ircu)
     sm = SesManager()
     sm.cmdloop()
     
