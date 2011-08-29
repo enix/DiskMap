@@ -147,7 +147,7 @@ class SesManager(cmd.Cmd):
             disk["path"] = path
             disk["device"] = disk["device"].replace("/dev/rdsk/", "")
             disk["readablesize"] = megabyze(disk["sizemb"]*1024*1024)
-            print "%(path)s  %23(device)s  %16%(model)s  %.2(readablesize)f  %(state)s"%disk
+            print "%(path)s  %23(device)s  %16(model)s  %.2(readablesize)f  %(state)s"%disk
         
     def __str__(self):
         result = []
