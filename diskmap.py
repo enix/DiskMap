@@ -19,6 +19,15 @@ def cleandict(mydict, *toint):
         result[k] = long(mydict[k]) if k in toint else mydict[k].strip()
     return result
 
+def megabyze(i):
+    """
+    Return the size in Kilo, Mega, Giga, Tera, Peta according to the input.
+    """
+    i = float(i)
+    for unit in "", "K", "M", "G", "T", "P":
+        if i < 2000: break
+        i = i / 1024
+        return "%.1f%s"%(i, unit)
 
 class SesManager(cmd.Cmd):
     def __init__(self, *l, **kv):
@@ -131,12 +140,14 @@ class SesManager(cmd.Cmd):
 
     def do_disks(self, line):
         """Display detected disks """
-        list = [ ("%2d:%.2d%.3d"%(v["controller"], v["enclosureindex"], v["slot"]), v["device"], v["model"], v["state"])
+        list = [ ("%2d:%.2d:%.2d"%(v["controller"], v["enclosureindex"], v["slot"]), v)
                  for k,v in self.disks.items() if k.startswith("/dev/rdsk") ]
         list.sort()
-        for path, device, model, state in list:
-            print path, device, model, state
-            
+        for path, disk in list:
+            disk["path"] = path
+            disk["device"] = disk["device"].replace("/dev/rdsk/", "")
+            disk["readablesize"] = megabyze(disk["sizemb"]*1024*1024)
+            print "%(path)s  %23(device)s  %16%(model)s  %.2(readablesize)f  %(state)s"%disk
         
     def __str__(self):
         result = []
