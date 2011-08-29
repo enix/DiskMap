@@ -51,7 +51,7 @@ class StorageManager(object):
         result.append("="*80)
         result.append(pformat(self.enclosure))
 
-if __name__ == "__name__":
+if __name__ == "__main__":
     if not os.path.isfile(sas2ircu):
         sys.exit("Error, cannot find sas2ircu (%s)"%sas2ircu)
     st = StorageManager()
