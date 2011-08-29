@@ -3,7 +3,7 @@
 import subprocess, re, os, sys
 
 def run(cmd, *args):
-    return subprocess.Popen(tuple([cmd] + args),
+    return subprocess.Popen((cmd,) + args,
                             stdout=subprocess.PIPE).communicate()[0]
           
 
