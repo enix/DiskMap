@@ -50,7 +50,7 @@ class StorageManager(object):
                                  "Logical ID +: (?P<logicalid>[^ ]+)\n +"
                                  "Numslots +: (?P<numslot>[0-9]+)", tmp):
                 m = m.groupdict()
-                print m
+                m["controller"] = ctrl
                 self.enclosures[m["logicalid"]] = m
 
     def discover(self):
@@ -62,7 +62,7 @@ class StorageManager(object):
         from pprint import pformat
         result = [ "Controller" ]
         result.append("="*80)
-        result.append(pformat(self.controller))
+        result.append(pformat(self.controllers))
         result.append("")
         result.append("Enclosures")
         result.append("="*80)
