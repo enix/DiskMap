@@ -30,8 +30,8 @@ class SesManager(object):
         tmp = re.findall("(\n +[0-9]+ +.*)", tmp)
         for ctrl in tmp:
             ctrl = ctrl.strip()
-            m = re.match("(?P<index>[0-9]) +(?P<adaptertype>[^ ].*[^ ]) +(?P<vendorid>[^ ]+) +"
-                         "(?P<id>[^ ]+) +(?P<pciadress>[^ ]*:[^ ]*) +(?P<subsysvenid>[^ ]+) +"
+            m = re.match("(?P<id>[0-9]) +(?P<adaptertype>[^ ].*[^ ]) +(?P<vendorid>[^ ]+) +"
+                         "(?P<deviceid>[^ ]+) +(?P<pciadress>[^ ]*:[^ ]*) +(?P<subsysvenid>[^ ]+) +"
                          "(?P<subsysdevid>[^ ]+) *", ctrl)
             if m:
                 m = cleandict(m.groupdict(), "index")
@@ -42,8 +42,7 @@ class SesManager(object):
         if not ctrls:
             ctrls = self.controllers.keys()
         for ctrl in ctrls:
-            print ctrl
-            tmp = run(sas2ircu, ctrl["index"], "DISPLAY")
+            tmp = run(sas2ircu, ctrl, "DISPLAY")
             #tmp = file("/tmp/pouet.txt").read() # Test with Wraith__ setup
             enclosures = {}
             for m in re.finditer("Enclosure# +: (?P<index>[^ ]+)\n +"
