@@ -39,13 +39,19 @@ class StorageManager(object):
                 ctrl["index"] = int(ctrl["index"])
                 self.controller[ctrl["index"]] = ctrl
     def __repr__(self):
-        from pprint import pprint
-        print "Controllers"
-        print "="*80
-        pprint(self.controller)
-
-
+        from pprint import pformat
+        result = [ "Controller" ]
+        result.append("="*80)
+        result.append(pformat(self.controller))
+        result.append("")
+        result.append("Enclosures")
+        result.append("="*80)
+        result.append(pformat(self.enclosure))
 if __name__ == "__name__":
     if not os.path.isfile(sas2ircu):
         sys.exit("Error, cannot find sas2ircu (%s)"%sas2ircu)
+    st = StorageManager()
+    st.populate()
+    print st
+    
     
