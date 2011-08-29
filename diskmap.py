@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import subprocess, re, os, sys, readline, cmd, pickle
+from pprint import pformat, pprint
 
 cachefile = "/tmp/pouet"
 
@@ -119,9 +120,25 @@ class SesManager(cmd.Cmd):
     def do_load(self, line):
         """Load data from cache file"""
         self.controllers, self.enclosures, self.disks = pickle.load(file(cachefile))
+
+    def do_enclosures(self, line):
+        """Display detected enclosures"""
+        pprint(self.enclosures)
+
+    def do_controllers(self, line):
+        """Display detected controllers"""
+        pprint(self.controllers)
+
+    def do_disks(self, line):
+        """Display detected disks """
+        list = [ ("%2d:%.2d%.3d"%(v["controller"], v["enclosureindex"], v["slot"]), v["device"], v["model"], v["state"])
+                 for k,v in self.disks.items() if k.startswith("/dev/rdsk") ]
+        list.sort()
+        for path, device, model, state in list:
+            print path, device, model, state
+            
         
     def __str__(self):
-        from pprint import pformat
         result = []
         for i in ("controllers", "enclosures", "disks"):
             result.append(i.capitalize())
