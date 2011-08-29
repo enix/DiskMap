@@ -92,7 +92,8 @@ class SesManager(object):
             serial = serial.replace("WD-", "WD")
             if serial in self.disks:
                 self.disks[serial]["device"] = "/dev/rdsk/c1t%sd0"%device
-            print "Warning : Got this serial (%s), but can't find it in disk detected by sas2ircu"%serial
+            else:
+                print "Warning : Got this serial (%s), but can't find it in disk detected by sas2ircu"%serial
             
             
 
@@ -117,6 +118,6 @@ if __name__ == "__main__":
         sys.exit("Error, cannot find sas2ircu (%s)"%sas2ircu)
     sm = SesManager()
     sm.discover()
-    #print sm
+    print sm
     
     
