@@ -2,13 +2,20 @@
 
 import subprocess, re, os, sys
 
+
+sas2ircu = "/usr/sbin/sas2ircu"
+
+
 def run(cmd, *args):
     args = tuple([ str(i) for i in args ])
     return subprocess.Popen((cmd,) + args,
                             stdout=subprocess.PIPE).communicate()[0]
-          
 
-sas2ircu = "/usr/sbin/sas2ircu"
+def cleandict(mydict, *toint):
+    result = {}
+    for k in mydict.keys():
+        result[k] = long(mydict[k]) if k in toint else mydict[k]
+    return result
 
 class Disk(object):
     def __init__(self):
@@ -36,9 +43,8 @@ class StorageManager(object):
                          "(?P<deviceid>[^ ]+) +(?P<pciadress>[^ ]*:[^ ]*) +(?P<subsysvenid>[^ ]+) +"
                          "(?P<subsysdevid>[^ ]+) *", ctrl)
             if m:
-                ctrl = m.groupdict()
-                ctrl["index"] = int(ctrl["index"])
-                self.controllers[ctrl["index"]] = ctrl
+                m = cleandict(m.groupdict(), "index")
+                self.controllers[m["index"]] = ctrl
 
     def discover_enclosures(self, *ctrls):
         """ Discover enclosure wired to controller. If no controller specified, discover them all """
@@ -49,7 +55,7 @@ class StorageManager(object):
             for m in re.finditer("Enclosure# +: (?P<enclosureid>[^ ]+)\n +"
                                  "Logical ID +: (?P<logicalid>[^ ]+)\n +"
                                  "Numslots +: (?P<numslot>[0-9]+)", tmp):
-                m = m.groupdict()
+                m = cleandict(m.groupdict(), "logicalid", "numslot")
                 m["controller"] = ctrl
                 self.enclosures[m["logicalid"]] = m
             for m in re.finditer("Device is a Hard disk\n +"
@@ -64,9 +70,7 @@ class StorageManager(object):
                                  "Protocol +: (?P<protocol>[^\n]+)\n +"
                                  "Drive Type +: (?P<drivetype>[^\n]+)\n"
                                  , tmp):
-                m = m.groupdict()
-                for k in m.keys():
-                    m[k] = m[k].strip()
+                m = cleandict(m.groupdict(), "enclosure", "slot", "sizemb", "sizesector")
                 print m
             
                                 
