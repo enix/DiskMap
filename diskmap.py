@@ -96,13 +96,21 @@ class SesManager(cmd.Cmd):
                 # Add a reverse lookup
                 self.disks[device] = self.disks[serial]
             else:
-                print "Warning : Got this serial (%s), but can't find it in disk detected by sas2ircu"%serial
+                print "Warning : Got the serial %s from prtconf, but can't find it in disk detected by sas2ircu (disk removed ?)"%serial
 
+
+    def do_quit(self):
+        "Quit"
+        sys.exit()
     def do_discover(self, line=""):
-        """ perform discovery on host to populate controller, enclosures and disks """
+        """Perform discovery on host to populate controller, enclosures and disks """
         self.discover_controllers()
         self.discover_enclosures()
         self.discover_mapping()
+
+    def do_save(self):
+        """Save discovered topology to"""
+        pass
         
     def __str__(self):
         from pprint import pformat
