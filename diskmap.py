@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import subprocess, re, os, sys, readline, Cmd
+import subprocess, re, os, sys, readline, cmd
 
 
 sas2ircu = "/usr/sbin/sas2ircu"
@@ -18,7 +18,7 @@ def cleandict(mydict, *toint):
     return result
 
 
-class SesManager(Cmd):
+class SesManager(cmd.Cmd):
     def __init__(self, *l, **kv):
         super(self, SesManager).__init__(self, *l, **kv)
         self.enclosures = {}
