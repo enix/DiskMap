@@ -85,6 +85,7 @@ class SesManager(object):
         tmp = [ (a.upper(), b.upper()) for a, b in tmp ]
         tmp = dict(tmp)
         # Sometimes serial returned by prtconf and by sas2ircu are different. Mangle them
+        print tmp
         for serial, device in tmp.items()[:]:
             serial = serial.replace("WD-", "WD")
             if serial in self.disks:
@@ -114,6 +115,6 @@ if __name__ == "__main__":
         sys.exit("Error, cannot find sas2ircu (%s)"%sas2ircu)
     sm = SesManager()
     sm.discover()
-    print sm
+    #print sm
     
     
