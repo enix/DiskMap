@@ -4,7 +4,7 @@ import subprocess, re, os, sys
 
 
 sas2ircu = "/usr/sbin/sas2ircu"
-
+prtconf = "/usr/sbin/prtconf"
 
 def run(cmd, *args):
     args = tuple([ str(i) for i in args ])
@@ -73,7 +73,7 @@ class SesManager(object):
 
     def discover_mapping(self):
         """ use prtconf to get real device name using disk serial """
-        prtconf = run("/usr/bin/prtconf", "-v")
+        prtconf = run(prtconf, "-v")
         # Do some ugly magic to get what we want
         # First, get one line per drive
         prtconf = prtconf.replace("\n", "").replace("disk, instance", "\n")
