@@ -17,21 +17,12 @@ def cleandict(mydict, *toint):
         result[k] = long(mydict[k]) if k in toint else mydict[k].strip()
     return result
 
-class Disk(object):
-    def __init__(self):
-        pass
 
-class Enclosure(object):
-    def __init__(self):
-        self.disks = {}
-    def attach(self, disk):
-        self.disks[disk.id] = disk
-
-
-class StorageManager(object):
+class SesManager(object):
     def __init__(self):
         self.enclosures = {}
         self.controllers = {}
+        self.disks = {}
 
     def discover_controllers(self):
         """ Discover controller present in the computer """
@@ -53,12 +44,13 @@ class StorageManager(object):
         for ctrl in ctrls:
             #tmp = run(sas2ircu, ctrl, "DISPLAY")
             tmp = file("/tmp/pouet.txt").read()
+            enclosures = {}
             for m in re.finditer("Enclosure# +: (?P<index>[^ ]+)\n +"
                                  "Logical ID +: (?P<logicalid>[^ ]+)\n +"
                                  "Numslots +: (?P<numslot>[0-9]+)", tmp):
                 m = cleandict(m.groupdict(), "index", "numslot")
                 m["controller"] = ctrl
-                self.enclosures[m["logicalid"]] = m
+                enclosures[m["index"]] = m
             for m in re.finditer("Device is a Hard disk\n +"
                                  "Enclosure # +: (?P<enclosure>[^\n]+)\n +"
                                  "Slot # +: (?P<slot>[^\n]+)\n +"
@@ -72,7 +64,9 @@ class StorageManager(object):
                                  "Drive Type +: (?P<drivetype>[^\n]+)\n"
                                  , tmp):
                 m = cleandict(m.groupdict(), "enclosure", "slot", "sizemb", "sizesector")
-                print m
+                m["enclosure"] = enclosures[m["enclosure"]]["logicalid"]
+                m["controller"] = ctrl
+                self.disks[m["serial"]] = m
             
                                 
 
@@ -83,20 +77,19 @@ class StorageManager(object):
         
     def __str__(self):
         from pprint import pformat
-        result = [ "Controller" ]
-        result.append("="*80)
-        result.append(pformat(self.controllers))
-        result.append("")
-        result.append("Enclosures")
-        result.append("="*80)
-        result.append(pformat(self.enclosures))
+        result = []
+        for i in ("controllers", "enclosures", "disks"):
+            result.append(i.capitalize())
+            result.append("="*80)
+            result.append(pformat(getattr(self,i)))
+            result.append("")
         return "\n".join(result)
 
 if __name__ == "__main__":
     if not os.path.isfile(sas2ircu):
         sys.exit("Error, cannot find sas2ircu (%s)"%sas2ircu)
-    st = StorageManager()
-    st.discover()
-    print st
+    sm = SesManager()
+    sm.discover()
+    print sm
     
     
