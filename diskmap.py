@@ -112,12 +112,12 @@ class SesManager(cmd.Cmd):
 
     def do_save(self, line):
         """Save data to cache file"""
-        pickle.dump((self.controllers, self.enclosures, self.disks), cachefile)
+        pickle.dump((self.controllers, self.enclosures, self.disks), file(cachefile, "w+"))
 
 
     def do_load(self, line):
         """Load data from cache file"""
-        self.controllers, self.enclosures, self.disks = pickle.load(cachefile)
+        self.controllers, self.enclosures, self.disks = pickle.load(file(cachefile))
         
     def __str__(self):
         from pprint import pformat
