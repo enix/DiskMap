@@ -25,11 +25,13 @@ class StorageManager(object):
     def __init__(self):
         self.enclosures = {}
         self.controller = {}
+
     def populate(self):
         """ use sas2ircu to populate controller, enclosures ands disks """
         # First, get Ctrl
         tmp = run(sas2ircu, LIST)
         tmp = re.findall("(\n +[0-9]+ +.*)", tmp)
+        print tmp
         for ctrl in tmp:
             m = re.match(" +(?P<index>[0-9]) +(?P<adaptertype>[^ ].*[^ ]) +(?P<vendorid>[^ ]+) +"
                          "(?P<deviceid>[^ ]+) +(?P<pciadress>[^ ]*:[^ ]*) +(?P<subsysvenid>[^ ]+)"
@@ -38,6 +40,7 @@ class StorageManager(object):
                 ctrl = m.groupdict()
                 ctrl["index"] = int(ctrl["index"])
                 self.controller[ctrl["index"]] = ctrl
+
     def __repr__(self):
         from pprint import pformat
         result = [ "Controller" ]
@@ -47,11 +50,12 @@ class StorageManager(object):
         result.append("Enclosures")
         result.append("="*80)
         result.append(pformat(self.enclosure))
+
 if __name__ == "__name__":
     if not os.path.isfile(sas2ircu):
         sys.exit("Error, cannot find sas2ircu (%s)"%sas2ircu)
     st = StorageManager()
     st.populate()
-    print st
+    print st.__repr__()
     
     
