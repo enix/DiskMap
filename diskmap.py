@@ -18,9 +18,9 @@ def cleandict(mydict, *toint):
     return result
 
 
-class SesManager(object, cmd.Cmd):
+class SesManager(cmd.Cmd):
     def __init__(self, *l, **kv):
-        super(SesManager, self).__init__(*l, **kv)
+        cmd.Cmd.__init__(self, *l, **kv)
         self.enclosures = {}
         self.controllers = {}
         self.disks = {}
