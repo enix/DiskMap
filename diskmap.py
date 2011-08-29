@@ -87,7 +87,7 @@ class SesManager(object):
         print self.disks
         print tmp
         # Sometimes serial returned by prtconf and by sas2ircu are different. Mangle them
-            for serial, device in tmp.items()[:]:
+        for serial, device in tmp.items()[:]:
             serial = serial.strip()
             serial = serial.replace("WD-", "WD")
             if serial in self.disks:
