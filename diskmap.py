@@ -36,7 +36,7 @@ class StorageManager(object):
             m = re.match(" +(?P<index>[0-9]) +(?P<adaptertype>[^ ].*[^ ]) +(?P<vendorid>[^ ]+) +"
                          "(?P<deviceid>[^ ]+) +(?P<pciadress>[^ ]*:[^ ]*) +(?P<subsysvenid>[^ ]+) +"
                          "(?P<subsysdevid>[^ ]+) *", ctrl)
-
+            print m
             if m:
                 ctrl = m.groupdict()
                 ctrl["index"] = int(ctrl["index"])
