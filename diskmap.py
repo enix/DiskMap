@@ -56,7 +56,7 @@ class StorageManager(object):
                                  "Enclosure # +: (?P<enclosure>[^ ]+)\n +"
                                  "Slot # +: (?P<slot>[^ ]+)\n +"
                                  "State +: (?P<state>[^ ]+)\n +"
-                                 "Size .in MB./.in sectors. +: (?P<sizemb>[^/]+)/(?P<sizesector>[^ ]+)\n +"
+#                                 "Size .in MB./.in sectors. +: (?P<sizemb>[^/]+)/(?P<sizesector>[^ ]+)\n +"
 #                                 "Manufacturer +: (?P<manufacturer>[^ ]+)\n +"
 #                                 "Model Number +: (?P<model>[^ ]+)\n +"
 #                                 "Firmware Revision +: (?P<firmware>[^ ]+)\n +"
