@@ -44,7 +44,7 @@ class StorageManager(object):
                          "(?P<subsysdevid>[^ ]+) *", ctrl)
             if m:
                 m = cleandict(m.groupdict(), "index")
-                self.controllers[m["index"]] = ctrl
+                self.controllers[m["index"]] = m
 
     def discover_enclosures(self, *ctrls):
         """ Discover enclosure wired to controller. If no controller specified, discover them all """
