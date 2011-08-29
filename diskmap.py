@@ -98,8 +98,8 @@ class SesManager(cmd.Cmd):
             else:
                 print "Warning : Got this serial (%s), but can't find it in disk detected by sas2ircu"%serial
 
-    def discover(self):
-        """ use sas2ircu to populate controller, enclosures ands disks """
+    def do_discover(self):
+        """ perform discovery on host to populate controller, enclosures and disks """
         self.discover_controllers()
         self.discover_enclosures()
         self.discover_mapping()
