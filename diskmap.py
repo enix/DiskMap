@@ -45,14 +45,17 @@ class SesManager(object):
             tmp = run(sas2ircu, ctrl, "DISPLAY")
             #tmp = file("/tmp/pouet.txt").read() # Test with Wraith__ setup
             enclosures = {}
+            # Discover enclosures
             for m in re.finditer("Enclosure# +: (?P<index>[^ ]+)\n +"
                                  "Logical ID +: (?P<id>[^ ]+)\n +"
                                  "Numslots +: (?P<numslot>[0-9]+)", tmp):
                 m = cleandict(m.groupdict(), "index", "numslot")
                 m["controller"] = ctrl
                 enclosures[m["index"]] = m
+            print enclosures
+            # Discover Drives
             for m in re.finditer("Device is a Hard disk\n +"
-                                 "Enclosure # +: (?P<index>[^\n]+)\n +"
+                                 "Enclosure # +: (?P<enclosureindex>[^\n]+)\n +"
                                  "Slot # +: (?P<slot>[^\n]+)\n +"
                                  "State +: (?P<state>[^\n]+)\n +"
                                  "Size .in MB./.in sectors. +: (?P<sizemb>[^/]+)/(?P<sizesector>[^\n]+)\n +"
@@ -64,7 +67,7 @@ class SesManager(object):
                                  "Drive Type +: (?P<drivetype>[^\n]+)\n"
                                  , tmp):
                 m = cleandict(m.groupdict(), "enclosure", "slot", "sizemb", "sizesector")
-                m["enclosure"] = enclosures[m["index"]]["id"]
+                m["enclosure"] = enclosures[m["enclosureindex"]]["id"]
                 m["controller"] = ctrl
                 self.disks[m["serial"]] = m
             
