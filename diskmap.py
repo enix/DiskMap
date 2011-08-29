@@ -3,7 +3,7 @@
 import subprocess, re, os, sys
 
 def run(cmd, *args):
-    args = [ str(i) for i in args ]
+    args = ( str(i) for i in args )
     return subprocess.Popen((cmd,) + args,
                             stdout=subprocess.PIPE).communicate()[0]
           
