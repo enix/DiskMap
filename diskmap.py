@@ -6,9 +6,8 @@ def run(cmd, *args):
     return subprocess.Popen([cmd] + args, stdout=subprocess.PIPE).communicate()[0]
           
 
-sas2ircu = "/usr/bin/sas2ircu"
-if not os.path.isfile(sas2ircu):
-    sys.exit("Error, cannot find sas2ircu (%s)"%sas2ircu)
+sas2ircu = "/usr/sbin/sas2ircu"
+
 
 class Enclosure(object):
     def __init__(self):
@@ -28,3 +27,9 @@ class StorageManager(objet):
     def populate(self):
         """ use sas2ircu to populate enclosures ands disks """
         run
+
+
+if __name__ == "__name__":
+    if not os.path.isfile(sas2ircu):
+        sys.exit("Error, cannot find sas2ircu (%s)"%sas2ircu)
+    
