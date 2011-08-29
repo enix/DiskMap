@@ -29,9 +29,8 @@ class StorageManager(object):
     def populate(self):
         """ use sas2ircu to populate controller, enclosures ands disks """
         # First, get Ctrl
-        tmp = run(sas2ircu, LIST)
+        tmp = run(sas2ircu, "LIST")
         tmp = re.findall("(\n +[0-9]+ +.*)", tmp)
-        print "poeut"
         for ctrl in tmp:
             m = re.match(" +(?P<index>[0-9]) +(?P<adaptertype>[^ ].*[^ ]) +(?P<vendorid>[^ ]+) +"
                          "(?P<deviceid>[^ ]+) +(?P<pciadress>[^ ]*:[^ ]*) +(?P<subsysvenid>[^ ]+)"
