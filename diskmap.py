@@ -24,9 +24,9 @@ class Enclosure(object):
 class StorageManager(object):
     def __init__(self):
         self.enclosures = {}
-        self.controller = {}
+        self.controllers = {}
 
-    def discover_controller(self):
+    def discover_controllers(self):
         """ Discover controller present in the computer """
         tmp = run(sas2ircu, "LIST")
         tmp = re.findall("(\n +[0-9]+ +.*)", tmp)
@@ -38,12 +38,12 @@ class StorageManager(object):
             if m:
                 ctrl = m.groupdict()
                 ctrl["index"] = int(ctrl["index"])
-                self.controller[ctrl["index"]] = ctrl
+                self.controllers[ctrl["index"]] = ctrl
 
-    def discover_enclosure(self, *ctrls):
+    def discover_enclosures(self, *ctrls):
         """ Discover enclosure wired to controller. If no controller specified, discover them all """
         if not ctrls:
-            ctrls = self.controller.keys()
+            ctrls = self.controllers.keys()
         for ctrl in ctrls:
             tmp = run(sas2ircu, ctrl, "DISPLAY")
             for m in re.finditer("Enclosure# +: (?P<enclosureid>[^ ]+)\n +"
@@ -51,12 +51,12 @@ class StorageManager(object):
                                  "Numslots +: (?P<numslot>[0-9]+)", tmp):
                 m = m.groupdict()
                 print m
-                self.enclosure[m["logicalid"]] = m
+                self.enclosures[m["logicalid"]] = m
 
     def discover(self):
         """ use sas2ircu to populate controller, enclosures ands disks """
-        self.discover_controller()
-        self.discover_enclosure()
+        self.discover_controllers()
+        self.discover_enclosures()
         
     def __str__(self):
         from pprint import pformat
