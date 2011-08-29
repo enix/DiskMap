@@ -52,10 +52,10 @@ class StorageManager(object):
             ctrls = self.controllers.keys()
         for ctrl in ctrls:
             tmp = run(sas2ircu, ctrl, "DISPLAY")
-            for m in re.finditer("Enclosure# +: (?P<enclosureid>[^ ]+)\n +"
+            for m in re.finditer("Enclosure# +: (?P<index>[^ ]+)\n +"
                                  "Logical ID +: (?P<logicalid>[^ ]+)\n +"
                                  "Numslots +: (?P<numslot>[0-9]+)", tmp):
-                m = cleandict(m.groupdict(), "logicalid", "numslot")
+                m = cleandict(m.groupdict(), "index", "numslot")
                 m["controller"] = ctrl
                 self.enclosures[m["logicalid"]] = m
             for m in re.finditer("Device is a Hard disk\n +"
