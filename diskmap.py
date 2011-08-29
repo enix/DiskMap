@@ -53,16 +53,17 @@ class StorageManager(object):
                 m["controller"] = ctrl
                 self.enclosures[m["logicalid"]] = m
             for m in re.finditer("Device is a Hard disk\n +"
-                                 "Enclosure # +: (?P<enclosure>[^ ]+)\n +"
-                                 "Slot # +: (?P<slot>[^ ]+)\n +"
-                                 "State +: (?P<state>[^ ]+)\n +"
-                                 "Size .in MB./.in sectors. +: (?P<sizemb>[^/]+)/(?P<sizesector>[^ ]+)\n +"
-                                 "Manufacturer +: (?P<manufacturer>[^ ]+)\n +"
-                                 "Model Number +: (?P<model>[^ ]+)\n +"
-                                 "Firmware Revision +: (?P<firmware>[^ ]+)\n +"
-                                 "Serial No +: (?P<serial>[^ ]+)\n +"
-                                 "Protocol +: (?P<protocol>[^ ]+)\n +"
-                                 "Drive Type +: (?P<drivetype>[^ ]+)\n", tmp):
+#                                 "Enclosure # +: (?P<enclosure>[^ ]+)\n +"
+#                                 "Slot # +: (?P<slot>[^ ]+)\n +"
+#                                 "State +: (?P<state>[^ ]+)\n +"
+#                                 "Size .in MB./.in sectors. +: (?P<sizemb>[^/]+)/(?P<sizesector>[^ ]+)\n +"
+#                                 "Manufacturer +: (?P<manufacturer>[^ ]+)\n +"
+#                                 "Model Number +: (?P<model>[^ ]+)\n +"
+#                                 "Firmware Revision +: (?P<firmware>[^ ]+)\n +"
+#                                 "Serial No +: (?P<serial>[^ ]+)\n +"
+#                                 "Protocol +: (?P<protocol>[^ ]+)\n +"
+#                                 "Drive Type +: (?P<drivetype>[^ ]+)\n"
+                                 , tmp):
                 print m.groupdict()
             
                                 
