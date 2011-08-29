@@ -31,28 +31,28 @@ class SesManager(object):
         for ctrl in tmp:
             ctrl = ctrl.strip()
             m = re.match("(?P<index>[0-9]) +(?P<adaptertype>[^ ].*[^ ]) +(?P<vendorid>[^ ]+) +"
-                         "(?P<deviceid>[^ ]+) +(?P<pciadress>[^ ]*:[^ ]*) +(?P<subsysvenid>[^ ]+) +"
+                         "(?P<id>[^ ]+) +(?P<pciadress>[^ ]*:[^ ]*) +(?P<subsysvenid>[^ ]+) +"
                          "(?P<subsysdevid>[^ ]+) *", ctrl)
             if m:
                 m = cleandict(m.groupdict(), "index")
-                self.controllers[m["index"]] = m
+                self.controllers[m["id"]] = m
 
     def discover_enclosures(self, *ctrls):
         """ Discover enclosure wired to controller. If no controller specified, discover them all """
         if not ctrls:
             ctrls = self.controllers.keys()
         for ctrl in ctrls:
-            #tmp = run(sas2ircu, ctrl, "DISPLAY")
-            tmp = file("/tmp/pouet.txt").read()
+            tmp = run(sas2ircu, ctrl["index"], "DISPLAY")
+            #tmp = file("/tmp/pouet.txt").read() # Test with Wraith__ setup
             enclosures = {}
             for m in re.finditer("Enclosure# +: (?P<index>[^ ]+)\n +"
-                                 "Logical ID +: (?P<logicalid>[^ ]+)\n +"
+                                 "Logical ID +: (?P<id>[^ ]+)\n +"
                                  "Numslots +: (?P<numslot>[0-9]+)", tmp):
                 m = cleandict(m.groupdict(), "index", "numslot")
                 m["controller"] = ctrl
                 enclosures[m["index"]] = m
             for m in re.finditer("Device is a Hard disk\n +"
-                                 "Enclosure # +: (?P<enclosure>[^\n]+)\n +"
+                                 "Enclosure # +: (?P<index>[^\n]+)\n +"
                                  "Slot # +: (?P<slot>[^\n]+)\n +"
                                  "State +: (?P<state>[^\n]+)\n +"
                                  "Size .in MB./.in sectors. +: (?P<sizemb>[^/]+)/(?P<sizesector>[^\n]+)\n +"
@@ -64,7 +64,7 @@ class SesManager(object):
                                  "Drive Type +: (?P<drivetype>[^\n]+)\n"
                                  , tmp):
                 m = cleandict(m.groupdict(), "enclosure", "slot", "sizemb", "sizesector")
-                m["enclosure"] = enclosures[m["enclosure"]]["logicalid"]
+                m["enclosure"] = enclosures[m["index"]]["id"]
                 m["controller"] = ctrl
                 self.disks[m["serial"]] = m
             
