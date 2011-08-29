@@ -20,7 +20,7 @@ def cleandict(mydict, *toint):
 
 class SesManager(cmd.Cmd):
     def __init__(self, *l, **kv):
-        super(SesManager, self).__init__(self, *l, **kv)
+        super(SesManager, self).__init__(*l, **kv)
         self.enclosures = {}
         self.controllers = {}
         self.disks = {}
