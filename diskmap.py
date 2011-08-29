@@ -21,12 +21,28 @@ class Disk(object):
         pass
 
 
-class StorageManager(objet):
+class StorageManager(object):
     def __init__(self):
         self.enclosures = {}
+        self.controller = {}
     def populate(self):
-        """ use sas2ircu to populate enclosures ands disks """
-        run
+        """ use sas2ircu to populate controller, enclosures ands disks """
+        # First, get Ctrl
+        tmp = run(sas2ircu, LIST)
+        tmp = re.findall("(\n +[0-9]+ +.*)", tmp)
+        for ctrl in tmp:
+            m = re.match(" +(?P<index>[0-9]) +(?P<adaptertype>[^ ].*[^ ]) +(?P<vendorid>[^ ]+) +"
+                         "(?P<deviceid>[^ ]+) +(?P<pciadress>[^ ]*:[^ ]*) +(?P<subsysvenid>[^ ]+)"
+                         "+(?P<subsysdevid>[^ ]+) *", ctrl)
+            if m:
+                ctrl = m.groupdict()
+                ctrl["index"] = int(ctrl["index"])
+                self.controller[ctrl["index"]] = ctrl
+    def __repr__(self):
+        from pprint import pprint
+        print "Controllers"
+        print "="*80
+        pprint(self.controller)
 
 
 if __name__ == "__name__":
