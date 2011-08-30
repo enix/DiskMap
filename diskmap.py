@@ -117,10 +117,6 @@ class SesManager(cmd.Cmd):
             self.do_discover("")
             self.do_save("")
 
-    def postloop(self):
-        if self.disks:
-            self.do_save("")
-
     def do_quit(self, line):
         "Quit"
         return True
@@ -131,6 +127,8 @@ class SesManager(cmd.Cmd):
         self.discover_controllers()
         self.discover_enclosures()
         self.discover_mapping()
+        self.do_save("")
+    do_refresh = do_discover
 
     def do_save(self, line):
         """Save data to cache file"""
