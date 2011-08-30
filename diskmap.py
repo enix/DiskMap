@@ -200,14 +200,11 @@ class SesManager(cmd.Cmd):
         try:
             c, e = line.split(":", 1)
             c, e = long(c), long(e)
-            print self.enclosures.values()
             tmp = [ v["id"].lower() for v in self.enclosures.values()
                     if v["controller"] == c and v["index"] == e ]
-            print "tmp", tmp
             if len(tmp) != 1: raise
             return tmp[0]
-        except Exception, e:
-            print e
+        except:
             return None
 
     def get_disk(self, line):
@@ -250,6 +247,7 @@ class SesManager(cmd.Cmd):
         else:
             # Try to see if it's an enclosure
             target = self.get_enclosure(line)
+            print target
             if target:
                 targets = [ disk for disk in self.disks.values() if disk["enclosure"] == line ]
             else:
