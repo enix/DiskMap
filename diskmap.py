@@ -177,7 +177,7 @@ if __name__ == "__main__":
     #    sys.exit("Error, cannot find sas2ircu (%s)"%sas2ircu)
     sm = SesManager()
     if len(sys.argv) > 1:
-        sm.preloop("")
+        sm.preloop()
         sm.onecmd(" ".join(sys.argv[1:]))
     else:
         sm.cmdloop()
