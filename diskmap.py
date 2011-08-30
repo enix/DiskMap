@@ -192,8 +192,11 @@ class SesManager(cmd.Cmd):
     def get_enclosure(self, line):
         """ Try to find an enclosure """
         if line in self.aliases:
+            print line
             line = self.aliases[line]
+        print line
         if line in self.enclosures:
+            print line
             return line
         if line.lower() in self.enclosures:
             return line.lower()
@@ -218,7 +221,6 @@ class SesManager(cmd.Cmd):
             # Check if first element of path is an enclosure
             tmp = line.split(":",2)
             if len(tmp) == 2:
-                print tmp[0]
                 e = get_enclosure(tmp[0])
                 if e:
                     return [ disk for disk in self.disks.values()
