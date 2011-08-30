@@ -125,7 +125,7 @@ class SesManager(cmd.Cmd):
     def set_leds(self, disks, value=True):
         if isinstance(disks, dict):
             disks = disks.values()
-        progress = xrange(0,len(disks), 1).__iter__()
+        progress = xrange(1,len(disks)+1, 1).__iter__()
         value = "on" if value else "off"
         for disk in disks:
             print "\rTurning leds %s : %3d/%d"%(value, progress.next(),len(disks)),
