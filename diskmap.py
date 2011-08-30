@@ -221,13 +221,13 @@ class SesManager(cmd.Cmd):
                 e = get_enclosure(tmp[0])
                 if e:
                     return [ disk for disk in self.disks.values()
-                             if disk["enclosure"] == e and disk["slot"] == long(tmp[1]) ][0]
+                             if disk["enclosure"] == e and disk["slot"] == long(tmp[1]) ]
             else:
                 c, e, s = tmp
                 c, e, s = long(c), long(e), long(s)
                 return [ disk for disk in self.disks.values()
                          if disk["controller"] == c and disk["enclosureindex"] == e
-                         and s == None or disk["slot"] == s ][0]
+                         and s == None or disk["slot"] == s ]
         except:
             return None
 
