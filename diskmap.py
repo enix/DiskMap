@@ -220,6 +220,7 @@ class SesManager(cmd.Cmd):
             if len(tmp) == 2:
                 e = get_enclosure(tmp[0])
                 if e:
+                    print e
                     return [ disk for disk in self.disks.values()
                              if disk["enclosure"] == e and disk["slot"] == long(tmp[1]) ]
             else:
