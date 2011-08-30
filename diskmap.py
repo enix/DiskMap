@@ -218,8 +218,8 @@ class SesManager(cmd.Cmd):
             # Check if first element of path is an enclosure
             tmp = line.split(":",2)
             if len(tmp) == 2:
+                print tmp[0]
                 e = get_enclosure(tmp[0])
-                print e
                 if e:
                     return [ disk for disk in self.disks.values()
                              if disk["enclosure"] == e and disk["slot"] == long(tmp[1]) ]
