@@ -187,7 +187,7 @@ class SesManager(cmd.Cmd):
     def do_ledoff(self, line):
         """ Turn on locate led on parameters FIXME : syntax parameters"""
         if line == "all":
-            self.setled
+            self.set_leds(self.disks, False)
     
     def __str__(self):
         result = []
