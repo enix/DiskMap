@@ -192,11 +192,8 @@ class SesManager(cmd.Cmd):
     def get_enclosure(self, line):
         """ Try to find an enclosure """
         if line in self.aliases:
-            print line
             line = self.aliases[line]
-        print line
         if line in self.enclosures:
-            print line
             return line
         if line.lower() in self.enclosures:
             return line.lower()
