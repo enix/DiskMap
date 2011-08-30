@@ -34,8 +34,12 @@ class SesManager(cmd.Cmd):
         cmd.Cmd.__init__(self, *l, **kv)
         self.enclosures = {}
         self.controllers = {}
-        self.disks = {}
+        self._disks = {}
         self.prompt = "Diskmap> "
+
+    @property
+    def disks(self):
+        return dict([ (k, v) for k, v in self._disks if k.startswith("/dev/rdsk/") ])
 
     def discover_controllers(self):
         """ Discover controller present in the computer """
@@ -82,7 +86,7 @@ class SesManager(cmd.Cmd):
                 m = cleandict(m.groupdict(), "enclosureindex", "slot", "sizemb", "sizesector")
                 m["enclosure"] = enclosures[m["enclosureindex"]]["id"]
                 m["controller"] = ctrl
-                self.disks[m["serial"]] = m
+                self._disks[m["serial"]] = m
 
     def discover_mapping(self):
         """ use prtconf to get real device name using disk serial """
@@ -102,13 +106,20 @@ class SesManager(cmd.Cmd):
             serial = serial.strip()
             serial = serial.replace("WD-", "WD")
             device = "/dev/rdsk/c1t%sd0"%device
-            if serial in self.disks:
+            if serial in self._disks:
                 # Add device name to disks
-                self.disks[serial]["device"] = device
+                self._disks[serial]["device"] = device
                 # Add a reverse lookup
-                self.disks[device] = self.disks[serial]
+                self._disks[device] = self._disks[serial]
             else:
                 print "Warning : Got the serial %s from prtconf, but can't find it in disk detected by sas2ircu (disk removed ?)"%serial
+
+    def set_leds(self, disks, value=True):
+        print "Turning leds", "on" if value else "off",
+        for disk in disks:
+            run(sas2ircu, disk["controller"], "locate", "%(enclosureindex)s:%(slot)s", "on" if value else "off")
+            print ".",
+        print
 
     def preloop(self):
         if os.path.exists(cachefile):
@@ -132,12 +143,12 @@ class SesManager(cmd.Cmd):
 
     def do_save(self, line):
         """Save data to cache file"""
-        pickle.dump((self.controllers, self.enclosures, self.disks), file(cachefile, "w+"))
+        pickle.dump((self.controllers, self.enclosures, self._disks), file(cachefile, "w+"))
 
 
     def do_load(self, line):
         """Load data from cache file"""
-        self.controllers, self.enclosures, self.disks = pickle.load(file(cachefile))
+        self.controllers, self.enclosures, self._disks = pickle.load(file(cachefile))
 
     def do_enclosures(self, line):
         """Display detected enclosures"""
@@ -160,7 +171,16 @@ class SesManager(cmd.Cmd):
             disk["device"] = disk["device"].replace("/dev/rdsk/", "")
             disk["readablesize"] = megabyze(disk["sizemb"]*1024*1024)
             print "%(path)s  %(device)23s  %(model)16s  %(readablesize)6s  %(state)s"%disk
-        
+
+    def do_ledon(self, line):
+        """ Turn on locate led on parameters FIXME : syntax parameters"""
+        pass
+
+    def do_ledoff(self, line):
+        """ Turn on locate led on parameters FIXME : syntax parameters"""
+        if line == "all":
+            self.setled
+    
     def __str__(self):
         result = []
         for i in ("controllers", "enclosures", "disks"):
