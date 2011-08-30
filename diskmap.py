@@ -233,6 +233,7 @@ class SesManager(cmd.Cmd):
         candidates.extend([ "%(controller)s:%(enclosureindex)s:%(slot)s"%disk for disks in self.disks.values() ])
         candidates.extend([ "%(controller)s:%(index)s"%enclosure for enclosure in self.enclosures.values() ] )
         candidates.sort()
+        print text, line
         return [ i for i in candidates if i.startswith(text) ]
         
         
