@@ -125,7 +125,7 @@ class SesManager(cmd.Cmd):
     def set_leds(self, disks, value=True):
         if isinstance(disks, dict):
             disks = disks.values()
-        progress = xrange(len(disks), -1)
+        progress = xrange(len(disks)-1, 0, -1).__iter__()
         value = "on" if value else "off"
         for disk in disks:
             run(sas2ircu, disk["controller"], "LOCATE", "%(enclosureindex)s:%(slot)s"%disk, value)
