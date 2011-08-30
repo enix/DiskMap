@@ -134,9 +134,9 @@ class SesManager(cmd.Cmd):
         print
 
     def preloop(self):
-        if os.path.exists(cachefile):
+        try:
             self.do_load()
-        else:
+        except:
             self.do_discover()
             self.do_save()
 
