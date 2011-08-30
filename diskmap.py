@@ -35,6 +35,7 @@ class SesManager(cmd.Cmd):
         self._enclosures = {}
         self._controllers = {}
         self._disks = {}
+        self._aliases = {}
         self.prompt = "Diskmap> "
 
     @property
@@ -139,6 +140,9 @@ class SesManager(cmd.Cmd):
             self.do_discover("")
             self.do_save("")
 
+    def emptyline(self):
+        self.do_help("")
+
     def do_quit(self, line):
         "Quit"
         return True
@@ -154,12 +158,12 @@ class SesManager(cmd.Cmd):
 
     def do_save(self, line):
         """Save data to cache file"""
-        pickle.dump((self.controllers, self.enclosures, self._disks), file(cachefile, "w+"))
+        pickle.dump((self.controllers, self.enclosures, self._disks, self._aliases), file(cachefile, "w+"))
 
 
     def do_load(self, line):
         """Load data from cache file"""
-        self.controllers, self.enclosures, self._disks = pickle.load(file(cachefile))
+        self.controllers, self.enclosures, self._disks, self._aliases = pickle.load(file(cachefile))
 
     def do_enclosures(self, line):
         """Display detected enclosures"""
@@ -191,6 +195,8 @@ class SesManager(cmd.Cmd):
         """ Turn on locate led on parameters FIXME : syntax parameters"""
         if line == "all":
             self.set_leds(self.disks, False)
+
+    def do_aliases(self, line)
     
     def __str__(self):
         result = []
