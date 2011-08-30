@@ -230,7 +230,8 @@ class SesManager(cmd.Cmd):
                 return [ disk for disk in self.disks.values()
                          if disk["controller"] == c and disk["enclosureindex"] == e
                          and disk["slot"] == s ]
-        except:
+        except Exception, e:
+            print e
             return None
 
     def do_drawletter(self, line):
