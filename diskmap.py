@@ -37,6 +37,7 @@ class SesManager(cmd.Cmd):
         self._disks = {}
         self.aliases = {}
         self.prompt = "Diskmap> "
+        self.use_rawinput = False
 
     @property
     def disks(self):
