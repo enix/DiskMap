@@ -211,8 +211,8 @@ class SesManager(cmd.Cmd):
         for t in (line, "/dev/rdsk/%s"%line, line.upper(), line.lower()):
             tmp = self._disks.get(t, None)
             if tmp:
-                targets = [ tmp ]
-                break
+                return [ tmp ]
+    
         # Try to locate by path
         try:
             # Check if first element of path is an enclosure
@@ -251,9 +251,7 @@ class SesManager(cmd.Cmd):
                 targets = [ disk for disk in self.disks.values() if disk["enclosure"] == line ]
             else:
                 # Try to see if it's a disk
-                print targets
                 targets = self.get_disk(line)
-                print targets
         if targets:
             pprint(targets)
             self.set_leds(targets, value)
