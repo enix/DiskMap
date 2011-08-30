@@ -189,7 +189,33 @@ class SesManager(cmd.Cmd):
 
     def do_ledon(self, line):
         """ Turn on locate led on parameters FIXME : syntax parameters"""
-        pass
+        line = line.strip()
+        if line == "all":
+            targets = self.disks
+        else:
+            if line in self.aliases:
+                line = self.aliases[line]
+            if line in self.enclosures:
+                targets = [ disk for disk in self.disks.values() if disk.enclosure = line ]
+            else:
+                for t in (line, "/dev/rdsk/%s"%line, line.upper(), line.lower()):
+                    tmp = self._disks.get(line, None)
+                    if tmp:
+                        targets = [ tmp ]
+                        break
+                # Try to locate by path
+                try:
+                    c, e, s = line.split(":", 2)
+                    c, e, s = long(c), long(e), long(s)
+                    targets = [ disk for disk in self.disks.values()
+                            if disk["controller"] == c and disk["enclosureindex"] == e
+                            and disk["slot"] = s ]
+                except:
+                    pass
+        if targets:
+            self.set_leds(targets, True)
+        else:
+            print "Could not find what you're talking about"
 
     def do_ledoff(self, line):
         """ Turn on locate led on parameters FIXME : syntax parameters"""
