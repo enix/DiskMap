@@ -187,8 +187,7 @@ class SesManager(cmd.Cmd):
             disk["readablesize"] = megabyze(disk["sizemb"]*1024*1024)
             print "%(path)s  %(device)23s  %(model)16s  %(readablesize)6s  %(state)s"%disk
 
-    def do_ledon(self, line):
-        """ Turn on locate led on parameters FIXME : syntax parameters"""
+    def ledparse(self, value, line):
         line = line.strip()
         targets = []
         if line == "all":
@@ -214,14 +213,17 @@ class SesManager(cmd.Cmd):
                 except:
                     pass
         if targets:
-            self.set_leds(targets, True)
+            self.set_leds(targets, value)
         else:
             print "Could not find what you're talking about"
 
-    def do_ledoff(self, line):
+    def do_ledon(self, line):
         """ Turn on locate led on parameters FIXME : syntax parameters"""
-        if line == "all":
-            self.set_leds(self.disks, False)
+        self.ledparse(True, line)
+        
+    def do_ledoff(self, line):
+        """ Turn off locate led on parameters FIXME : syntax parameters"""
+        self.ledparse(False, line)
 
     def do_alias(self, line):
         """
