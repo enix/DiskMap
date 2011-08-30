@@ -200,7 +200,7 @@ class SesManager(cmd.Cmd):
                 targets = [ disk for disk in self.disks.values() if disk.enclosure == line ]
             else:
                 for t in (line, "/dev/rdsk/%s"%line, line.upper(), line.lower()):
-                    tmp = self._disks.get(line, None)
+                    tmp = self._disks.get(t, None)
                     if tmp:
                         targets = [ tmp ]
                         break
