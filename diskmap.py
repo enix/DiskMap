@@ -188,34 +188,70 @@ class SesManager(cmd.Cmd):
             disk["readablesize"] = megabyze(disk["sizemb"]*1024*1024)
             print "%(path)s  %(device)23s  %(model)16s  %(readablesize)6s  %(state)s"%disk
 
+
+    def get_enclosure(self, line):
+        """ Try to find an enclosure """
+        if line in self.aliases:
+            line = self.aliases[line]
+        if line in self.enclosures:
+            return line
+        if line.lower() in self.enclosures:
+            return line.lower()
+        try:
+            c, e = target.split(":", 1)
+            c, e = long(c), long(e)
+            tmp = [ v["id"].lower() for v in self.enclosures.values()
+                    if v["controller"] == c and v["index"] == e ]
+            if len(tmp) != 1: raise
+            return tmp[0]
+        except:
+            return None
+
+    def get_disk(self, line):
+        for t in (line, "/dev/rdsk/%s"%line, line.upper(), line.lower()):
+            tmp = self._disks.get(t, None)
+            if tmp:
+                targets = [ tmp ]
+                break
+        # Try to locate by path
+        try:
+            # Check if first element of path is an enclosure
+            tmp = line.split(":",2)
+            if len(tmp) == 2:
+                e = get_enclosure(tmp[0])
+                if e:
+                    return [ disk for disk in self.disks.values()
+                             if disk["enclosure"] == e and disk["slot"] == long(tmp[1]) ][0]
+            else:
+                c, e, s = tmp
+                c, e, s = long(c), long(e), long(s)
+                return [ disk for disk in self.disks.values()
+                         if disk["controller"] == c and disk["enclosureindex"] == e
+                         and s == None or disk["slot"] == s ][0]
+        except:
+            return None
+
+    def do_drawletter(self, line):
+        """ Print a N on a 4x6 enclosure """
+        line = line.strip()
+        letter = { "N": [ 0, 1, 2, 3, 4, 5, 9, 10, 13, 14, 18, 19, 20, 21, 22, 23 ],
+                   "X": [ 0, 1, 4, 5, 8, 9, 14, 15, 18 , 19, 22, 23 ],
+                   # FIXME Ajouter les chiffres
+                   }
+
     def ledparse(self, value, line):
         line = line.strip()
         targets = []
         if line == "all":
             targets = self.disks
         else:
-            if line in self.aliases:
-                line = self.aliases[line]
-            if line in self.enclosures:
+            # Try to see if it's an enclosure
+            target = self.get_enclosure(line)
+            if target:
                 targets = [ disk for disk in self.disks.values() if disk["enclosure"] == line ]
             else:
-                for t in (line, "/dev/rdsk/%s"%line, line.upper(), line.lower()):
-                    tmp = self._disks.get(t, None)
-                    if tmp:
-                        targets = [ tmp ]
-                        break
-                # Try to locate by path
-                try:
-                    if line.count(":") == 1:
-                        c, e = line.split(":")
-                        c, e = long(c), long(e)
-                        s = None
-                    else:
-                        c, e, s = line.split(":", 2)
-                        c, e, s = long(c), long(e), long(s)
-                    targets = [ disk for disk in self.disks.values()
-                            if disk["controller"] == c and disk["enclosureindex"] == e
-                            and s == None or disk["slot"] == s ]
+                # Try to see if it's a disk
+                targets = self.get_disk(line)
                 except:
                     pass
         if targets:
@@ -258,26 +294,12 @@ class SesManager(cmd.Cmd):
         elif " " in line:
             alias,target = line.split(" ",1)
             alias = alias.strip()
-            target = target.strip()
-            if len(target) > 4:
-                # Guess we have an uuid
-                if target.lower() in self.enclosures:
-                    self.aliases[alias] = target.lower()
-                else:
-                    print "No such enclosure %s"%target.lower()
-            elif ":" in target:
-                # Guess we have a path
-                try:
-                    c, e = target.split(":", 1)
-                    c = long(c)
-                    e = long(e)
-                    tmp = [ v["id"].lower() for v in self.enclosures.values()
-                            if v["controller"] == c and v["index"] == e ]
-                    if len(tmp) != 1: raise
-                    self.aliases[alias] = tmp[0]
-                except Exception, e:
-                    print "Tryed to find your enclosure by path but couldn't find it (%s)"%e
-            self.do_save()
+            target = self.get_enclosure(target.strip())
+            if not target:
+                print "No such enclosure %s"%target.lower()
+            else:
+                self.aliases[alias] = target
+                self.do_save()
 
     def complete_alias(self, text, line, begidx, endidx):
         if line.startswith("alias -r "):
@@ -304,6 +326,7 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         sm.preloop()
         sm.onecmd(" ".join(sys.argv[1:]))
+        sm.postloop()
     else:
         sm.cmdloop()
     
