@@ -302,11 +302,11 @@ class SesManager(cmd.Cmd):
         elif " " in line:
             alias,target = line.split(" ",1)
             alias = alias.strip()
-            target = self.get_enclosure(target.strip())
-            if not target:
+            enclosure = self.get_enclosure(target.strip())
+            if not enclosure:
                 print "No such enclosure %s"%target.lower()
             else:
-                self.aliases[alias] = target
+                self.aliases[alias] = enclosure
                 self.do_save()
 
     def complete_alias(self, text, line, begidx, endidx):
