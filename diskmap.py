@@ -219,7 +219,7 @@ class SesManager(cmd.Cmd):
                     self.aliases[alias] = target.lower()
                 else:
                     print "No such enclosure %s"%target.lower()
-            else if ":" in target:
+            elif ":" in target:
                 # Guess we have a path
                 try:
                     c, e = target.split(":", 1)
