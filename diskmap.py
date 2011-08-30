@@ -205,7 +205,8 @@ class SesManager(cmd.Cmd):
                     if v["controller"] == c and v["index"] == e ]
             if len(tmp) != 1: raise
             return tmp[0]
-        except:
+        except Exception, e:
+            print e
             return None
 
     def get_disk(self, line):
