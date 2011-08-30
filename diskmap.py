@@ -77,7 +77,7 @@ class SesManager(cmd.Cmd):
                                  "Numslots +: (?P<numslot>[0-9]+)", tmp):
                 m = cleandict(m.groupdict(), "index", "numslot")
                 m["controller"] = ctrl
-                self._enclosures[m["id"]] = m
+                self._enclosures[m["id"].lower()] = m
                 enclosures[m["index"]] = m
             # Discover Drives
             for m in re.finditer("Device is a Hard disk\n +"
@@ -198,6 +198,8 @@ class SesManager(cmd.Cmd):
 
     def do_alias(self, line):
         """
+        Used to set a name on a enclosure.
+        
         Usage : alias key value
                 alias -r key
         Without parameters : list current alias
@@ -209,7 +211,26 @@ class SesManager(cmd.Cmd):
             del self.aliases[alias.strip()]
         elif " " in line:
             alias,target = line.split(" ",1)
-            self.aliases[alias.strip()] = target.strip()
+            alias = alias.strip()
+            target = target.strip()
+            if len(target) > 4:
+                # Guess we have an uuid
+                if target.lower() in self.enclosures:
+                    self.aliases[alias] = target.lower()
+                else:
+                    print "No such enclosure %s"%target.lower()
+            else if ":" in target:
+                # Guess we have a path
+                try:
+                    c, e = target.split(":", 1)
+                    c = long(c)
+                    e = long(e)
+                    tmp = [ v["id"].lower() for v in self.enclosures.values()
+                            if v["controller"] == c and v["index"] == e ]
+                    if len(tmp) != 1: raise
+                    self.aliases[alias] = tmp[0]
+                except Exception, e:
+                    print "Tryed to find your enclosure by path but couldn't find it (%s)"%e
             self.do_save()
         
     
