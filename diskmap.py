@@ -198,7 +198,7 @@ class SesManager(cmd.Cmd):
         if line.lower() in self.enclosures:
             return line.lower()
         try:
-            c, e = target.split(":", 1)
+            c, e = line.split(":", 1)
             c, e = long(c), long(e)
             print c, e
             tmp = [ v["id"].lower() for v in self.enclosures.values()
