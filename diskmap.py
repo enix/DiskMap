@@ -253,6 +253,7 @@ class SesManager(cmd.Cmd):
                 # Try to see if it's a disk
                 targets = self.get_disk(line)
         if targets:
+            print targets
             self.set_leds(targets, value)
         else:
             print "Could not find what you're talking about"
