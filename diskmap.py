@@ -32,14 +32,22 @@ def megabyze(i, fact=1000):
 class SesManager(cmd.Cmd):
     def __init__(self, *l, **kv):
         cmd.Cmd.__init__(self, *l, **kv)
-        self.enclosures = {}
-        self.controllers = {}
+        self._enclosures = {}
+        self._controllers = {}
         self._disks = {}
         self.prompt = "Diskmap> "
 
     @property
     def disks(self):
         return dict([ (k, v) for k, v in self._disks if k.startswith("/dev/rdsk/") ])
+
+    @property
+    def enclosures(self):
+        return self._enclosures
+
+    @property
+    def controllers(self):
+        return self._controllers
 
     def discover_controllers(self):
         """ Discover controller present in the computer """
