@@ -298,8 +298,8 @@ class SesManager(cmd.Cmd):
 
 
 if __name__ == "__main__":
-    #if not os.path.isfile(sas2ircu):
-    #    sys.exit("Error, cannot find sas2ircu (%s)"%sas2ircu)
+    if not os.path.isfile(sas2ircu):
+        sys.exit("Error, cannot find sas2ircu (%s)"%sas2ircu)
     sm = SesManager()
     if len(sys.argv) > 1:
         sm.preloop()
