@@ -196,11 +196,19 @@ class SesManager(cmd.Cmd):
         if line == "all":
             self.set_leds(self.disks, False)
 
-    def do_aliases(self, line):
+    def do_alias(self, line):
+        """
+        Usage : alias key value
+                alias -r key
+        Without parameters : list current alias
+        """
         if not line:
             pprint(self.aliases)
-        elif "=" in line:
-            alias,target = line.split("=",1)
+        elif line.startswith("-r"):
+            junk, alias = line.split(" ",1)
+            del self.aliases[alias.strip()]
+        elif " " in line:
+            alias,target = line.split(" ",1)
             self.aliases[alias.strip()] = target.strip()
             self.do_save()
         
