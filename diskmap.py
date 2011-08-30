@@ -200,6 +200,7 @@ class SesManager(cmd.Cmd):
         try:
             c, e = target.split(":", 1)
             c, e = long(c), long(e)
+            print c, e
             tmp = [ v["id"].lower() for v in self.enclosures.values()
                     if v["controller"] == c and v["index"] == e ]
             if len(tmp) != 1: raise
