@@ -233,9 +233,9 @@ class SesManager(cmd.Cmd):
         candidates.extend([ "%(controller)s:%(enclosureindex)s:%(slot)s"%disk for disks in self.disks.values() ])
         candidates.extend([ "%(controller)s:%(index)s"%enclosure for enclosure in self.enclosures.values() ] )
         candidates.sort()
-        print text, line
+        print candidates
         return [ i for i in candidates if i.startswith(text) ]
-        
+    complete_ledoff = complete_ledon
         
     def do_ledoff(self, line):
         """ Turn off locate led on parameters FIXME : syntax parameters"""
