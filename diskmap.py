@@ -191,7 +191,6 @@ class SesManager(cmd.Cmd):
 
     def get_enclosure(self, line):
         """ Try to find an enclosure """
-        print line
         if line in self.aliases:
             line = self.aliases[line]
         if line in self.enclosures:
@@ -205,7 +204,8 @@ class SesManager(cmd.Cmd):
                     if v["controller"] == c and v["index"] == e ]
             if len(tmp) != 1: raise
             return tmp[0]
-        except:
+        except Exception, e:
+            #print e
             return None
 
     def get_disk(self, line):
@@ -219,7 +219,6 @@ class SesManager(cmd.Cmd):
             # Check if first element of path is an enclosure
             tmp = line.split(":",2)
             if len(tmp) == 2:
-                print tmp
                 e = self.get_enclosure(tmp[0])
                 if e:
                     return [ disk for disk in self.disks.values()
@@ -231,7 +230,7 @@ class SesManager(cmd.Cmd):
                          if disk["controller"] == c and disk["enclosureindex"] == e
                          and disk["slot"] == s ]
         except Exception, e:
-            print e
+            #print e
             return None
 
     def do_drawletter(self, line):
