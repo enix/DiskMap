@@ -137,6 +137,7 @@ class SesManager(cmd.Cmd):
         try:
             self.do_load()
         except:
+            print "Loading of previous save failed, trying to discover"
             self.do_discover()
             self.do_save()
 
@@ -229,18 +230,17 @@ class SesManager(cmd.Cmd):
     def complete_ledon(self, text, line, begidx, endidx):
         candidates = []
         candidates.extend(self.aliases.keys())
-        candidates.extend(self._disks.keys())
-        candidates.extend([ "%(controller)s:%(enclosureindex)s:%(slot)s"%disk for disks in self.disks.values() ])
+        candidates.extend([ disk["device"] for disk in self.disks.values() ])
+        candidates.extend([ disk["serial"] for disk in self.disks.values() ])
+        candidates.extend([ "%(controller)s:%(enclosureindex)s:%(slot)s"%disk for disk in self.disks.values() ])
         candidates.extend([ "%(controller)s:%(index)s"%enclosure for enclosure in self.enclosures.values() ] )
         candidates.sort()
-        print candidates
         return [ i for i in candidates if i.startswith(text) ]
 
     complete_ledoff = complete_ledon
     def do_ledoff(self, line):
         """ Turn off locate led on parameters FIXME : syntax parameters"""
         self.ledparse(False, line)
-
 
     complete_alias = complete_ledon
     def do_alias(self, line):
