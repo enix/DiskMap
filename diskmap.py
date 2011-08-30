@@ -129,7 +129,7 @@ class SesManager(cmd.Cmd):
         value = "on" if value else "off"
         for disk in disks:
             run(sas2ircu, disk["controller"], "LOCATE", "%(enclosureindex)s:%(slot)s"%disk, value)
-            print "\rTurning leds %s : %s/%s"%(value, progress.next()/len(disk)),
+            print "\rTurning leds %s : %s/%s"%(value, progress.next(),len(disk)),
         print
 
     def preloop(self):
