@@ -190,6 +190,7 @@ class SesManager(cmd.Cmd):
     def do_ledon(self, line):
         """ Turn on locate led on parameters FIXME : syntax parameters"""
         line = line.strip()
+        targets = []
         if line == "all":
             targets = self.disks
         else:
