@@ -39,7 +39,7 @@ class SesManager(cmd.Cmd):
 
     @property
     def disks(self):
-        return dict([ (k, v) for k, v in self._disks if k.startswith("/dev/rdsk/") ])
+        return dict([ (k, v) for k, v in self._disks.items() if k.startswith("/dev/rdsk/") ])
 
     @property
     def enclosures(self):
