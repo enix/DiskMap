@@ -189,7 +189,7 @@ class SesManager(cmd.Cmd):
             disk["readablesize"] = megabyze(disk["sizemb"]*1024*1024)
             totalsize += disk["sizemb"]*1024*1024
             print "%(path)s  %(device)23s  %(model)16s  %(readablesize)6s  %(state)s"%disk
-        print "Total Drive : %s   Total Capacity : %s"%(len(self.disk), megabyze(totalsize))
+        print "Total Drive : %s   Total Capacity : %s"%(len(self.disks), megabyze(totalsize))
 
 
     def get_enclosure(self, line):
