@@ -125,7 +125,7 @@ class SesManager(cmd.Cmd):
     def set_leds(self, disks, value=True):
         print "Turning leds", "on" if value else "off",
         for disk in disks:
-            run(sas2ircu, disk["controller"], "locate", "%(enclosureindex)s:%(slot)s", "on" if value else "off")
+            run(sas2ircu, disk["controller"], "LOCATE", "%(enclosureindex)s:%(slot)s"%disk, "on" if value else "off")
             print ".",
         print
 
