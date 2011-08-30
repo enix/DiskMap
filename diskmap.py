@@ -236,10 +236,16 @@ class SesManager(cmd.Cmd):
     def do_drawletter(self, line):
         """ Print a N on a 4x6 enclosure """
         line = line.strip()
-        letter = { "N": [ 0, 1, 2, 3, 4, 5, 9, 10, 13, 14, 18, 19, 20, 21, 22, 23 ],
+        letters = { "N": [ 0, 1, 2, 3, 4, 5, 9, 10, 13, 14, 18, 19, 20, 21, 22, 23 ],
                    "X": [ 0, 1, 4, 5, 8, 9, 14, 15, 18 , 19, 22, 23 ],
                    # FIXME Ajouter les chiffres
                    }
+        letter, enclosure = line.split(" ",1)
+        e = self.get_enclosure(enclosure)
+        if not e:
+            print "Invalid enclosure %s"%e
+        self.do_ledoff(self, e)
+        self.set_leds([ "%s:%s"%(e, i) for i in letters[letter] ], True)
 
     def ledparse(self, value, line):
         line = line.strip()
