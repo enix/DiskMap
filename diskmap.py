@@ -196,7 +196,7 @@ class SesManager(cmd.Cmd):
             if line in self.aliases:
                 line = self.aliases[line]
             if line in self.enclosures:
-                targets = [ disk for disk in self.disks.values() if disk.enclosure == line ]
+                targets = [ disk for disk in self.disks.values() if disk["enclosure"] == line ]
             else:
                 for t in (line, "/dev/rdsk/%s"%line, line.upper(), line.lower()):
                     tmp = self._disks.get(t, None)
