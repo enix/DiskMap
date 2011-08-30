@@ -218,6 +218,7 @@ class SesManager(cmd.Cmd):
             # Check if first element of path is an enclosure
             tmp = line.split(":",2)
             if len(tmp) == 2:
+                print "coucou"
                 e = get_enclosure(tmp[0])
                 if e:
                     return [ disk for disk in self.disks.values()
@@ -253,7 +254,6 @@ class SesManager(cmd.Cmd):
                 # Try to see if it's a disk
                 targets = self.get_disk(line)
         if targets:
-            pprint(targets)
             self.set_leds(targets, value)
         else:
             print "Could not find what you're talking about"
