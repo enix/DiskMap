@@ -280,8 +280,7 @@ class SesManager(cmd.Cmd):
             self.do_save()
 
     def complete_alias(self, text, line, begidx, endidx):
-        print repr(line)
-        if line.startswith("-r "):
+        if line.startswith("alias -r "):
             return [ i for i in self.aliases.keys() if i.startswith(line) ]
         if line.count(" ") >= 2:
             return [ i for i in self.complete_ledon(text, line, begidx, endidx)
