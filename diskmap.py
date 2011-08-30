@@ -225,6 +225,7 @@ class SesManager(cmd.Cmd):
             else:
                 c, e, s = tmp
                 c, e, s = long(c), long(e), long(s)
+                print c, e, s
                 return [ disk for disk in self.disks.values()
                          if disk["controller"] == c and disk["enclosureindex"] == e
                          and s == None or disk["slot"] == s ]
