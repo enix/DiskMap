@@ -35,7 +35,7 @@ class SesManager(cmd.Cmd):
         self._enclosures = {}
         self._controllers = {}
         self._disks = {}
-        self._aliases = {}
+        self.aliases = {}
         self.prompt = "Diskmap> "
 
     @property
@@ -135,10 +135,10 @@ class SesManager(cmd.Cmd):
 
     def preloop(self):
         if os.path.exists(cachefile):
-            self.do_load("")
+            self.do_load()
         else:
-            self.do_discover("")
-            self.do_save("")
+            self.do_discover()
+            self.do_save()
 
     def emptyline(self):
         self.do_help("")
@@ -153,17 +153,17 @@ class SesManager(cmd.Cmd):
         self.discover_controllers()
         self.discover_enclosures()
         self.discover_mapping()
-        self.do_save("")
+        self.do_save()
     do_refresh = do_discover
 
-    def do_save(self, line):
-        """Save data to cache file"""
-        pickle.dump((self.controllers, self.enclosures, self._disks, self._aliases), file(cachefile, "w+"))
+    def do_save(self, line=cachefile):
+        """Save data to cache file. Use file %s if not specified"""%cachefile
+        pickle.dump((self.controllers, self.enclosures, self._disks, self.aliases), file(line, "w+"))
 
 
-    def do_load(self, line):
-        """Load data from cache file"""
-        self.controllers, self.enclosures, self._disks, self._aliases = pickle.load(file(cachefile))
+    def do_load(self, line=cachefile):
+        """Load data from cache file. Use file %s if not specified"""%cachefile
+        self.controllers, self.enclosures, self._disks, self.aliases = pickle.load(file(line))
 
     def do_enclosures(self, line):
         """Display detected enclosures"""
@@ -196,7 +196,14 @@ class SesManager(cmd.Cmd):
         if line == "all":
             self.set_leds(self.disks, False)
 
-    def do_aliases(self, line)
+    def do_aliases(self, line):
+        if not line:
+            pprint(self.aliases)
+        elif "=" in line:
+            alias,target = line.split("=",1)
+            self.aliases[alias.strip()] = target.strip()
+            self.do_save()
+        
     
     def __str__(self):
         result = []
