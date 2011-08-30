@@ -182,11 +182,14 @@ class SesManager(cmd.Cmd):
         if line == "-v":
             pprint (list)
             return
+        totalsize = 0
         for path, disk in list:
             disk["path"] = path
             disk["device"] = disk["device"].replace("/dev/rdsk/", "")
             disk["readablesize"] = megabyze(disk["sizemb"]*1024*1024)
+            totalsize += disk["sizemb"]*1024*1024
             print "%(path)s  %(device)23s  %(model)16s  %(readablesize)6s  %(state)s"%disk
+        print "Total Drive : %s   Total Capacity : %s"%(len(self.disk), megabyze(totalsize))
 
 
     def get_enclosure(self, line):
