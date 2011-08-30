@@ -313,10 +313,13 @@ class SesManager(cmd.Cmd):
         if line.startswith("alias -r "):
             return [ i for i in self.aliases.keys() if i.startswith(text) ]
         if line.count(" ") >= 2:
-            result = []
-            result.append(self.enclosures.keys())
-            result.append([ "%(controller)s:%(index)s"%e for e in self.enclosures.values() ])
-            return [ i for i in result if i.startswith(text) ]
+            try:
+                result = []
+                result.append(self.enclosures.keys())
+                result.append([ "%(controller)s:%(index)s"%e for e in self.enclosures.values() ])
+                return [ i for i in result if i.startswith(text) ]
+            except Exception, e:
+                print e
                         
     
     def __str__(self):
