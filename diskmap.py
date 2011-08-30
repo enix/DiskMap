@@ -228,9 +228,9 @@ class SesManager(cmd.Cmd):
         self.ledparse(True, line)
 
     def complete_ledon(self, text, line, begidx, endidx):
-        candidates = []
+        candidates = [ "all", "ALL" ]
         candidates.extend(self.aliases.keys())
-        candidates.extend([ disk["device"] for disk in self.disks.values() ])
+        candidates.extend([ disk["device"].replace("/dev/rdsk/", "") for disk in self.disks.values() ])
         candidates.extend([ disk["serial"] for disk in self.disks.values() ])
         candidates.extend([ "%(controller)s:%(enclosureindex)s:%(slot)s"%disk for disk in self.disks.values() ])
         candidates.extend([ "%(controller)s:%(index)s"%enclosure for enclosure in self.enclosures.values() ] )
@@ -242,7 +242,6 @@ class SesManager(cmd.Cmd):
         """ Turn off locate led on parameters FIXME : syntax parameters"""
         self.ledparse(False, line)
 
-    complete_alias = complete_ledon
     def do_alias(self, line):
         """
         Used to set a name on a enclosure.
@@ -279,7 +278,13 @@ class SesManager(cmd.Cmd):
                 except Exception, e:
                     print "Tryed to find your enclosure by path but couldn't find it (%s)"%e
             self.do_save()
-    
+
+    def complete_alias(self, text, line, begidx, endidx):
+        if line.startswith("-r "):
+            return [ i for i in self.aliases.keys() if i.startswith(line) ]
+        if line.count(" ") >= 2:
+            return [ i for i in self.complete_ledon(text, line, begidx, endidx)
+                     if i not in self.aliases ]
     
     def __str__(self):
         result = []
