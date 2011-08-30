@@ -123,10 +123,13 @@ class SesManager(cmd.Cmd):
                 print "Warning : Got the serial %s from prtconf, but can't find it in disk detected by sas2ircu (disk removed ?)"%serial
 
     def set_leds(self, disks, value=True):
-        print "Turning leds", "on" if value else "off",
-        for disk in disks.values():
-            run(sas2ircu, disk["controller"], "LOCATE", "%(enclosureindex)s:%(slot)s"%disk, "on" if value else "off")
-            print ".",
+        if isinstance(disks, dict):
+            disks = disks.values()
+        progress = xrange(len(disks), -1)
+        value = "on" if value else "off"
+        for disk in disks:
+            run(sas2ircu, disk["controller"], "LOCATE", "%(enclosureindex)s:%(slot)s"%disk, value)
+            print "\rTurning leds %s : %s/%s"%(value, progress.next()/len(disk)),
         print
 
     def preloop(self):
