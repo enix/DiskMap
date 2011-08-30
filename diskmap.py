@@ -246,7 +246,7 @@ class SesManager(cmd.Cmd):
         if not e:
             print "Invalid enclosure %s"%e
         self.do_ledoff(e)
-        self.set_leds([ "%s:%s"%(e, i) for i in letters[letter] ], True)
+        self.set_leds([ self.get_disk("%s:%s"%(e, i)) for i in letters[letter] ], True)
 
     def ledparse(self, value, line):
         line = line.strip()
