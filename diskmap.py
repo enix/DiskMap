@@ -214,7 +214,7 @@ class SesManager(cmd.Cmd):
                         c, e, s = long(c), long(e), long(s)
                     targets = [ disk for disk in self.disks.values()
                             if disk["controller"] == c and disk["enclosureindex"] == e
-                            and s != None and disk["slot"] == s ]
+                            and s == None or disk["slot"] == s ]
                 except:
                     pass
         if targets:
