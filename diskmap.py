@@ -225,6 +225,16 @@ class SesManager(cmd.Cmd):
     def do_ledon(self, line):
         """ Turn on locate led on parameters FIXME : syntax parameters"""
         self.ledparse(True, line)
+
+    def complete_ledon(self, text, line, begidx, endidx):
+        candidates = []
+        candidates.extend(self.aliases.keys())
+        candidates.extend(self._disks.keys())
+        candidates.extend([ "%(controller)s:%(enclosureindex)s:%(slot)s"%disk for disks in self.disks.values() ])
+        candidates.extend([ "%(controller)s:%(index)s"%enclosure for enclosure in self.enclosures.values() ] )
+        candidates.sort()
+        return [ i for i in candidates if i.startswith(text) ]
+        
         
     def do_ledoff(self, line):
         """ Turn off locate led on parameters FIXME : syntax parameters"""
