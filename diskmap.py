@@ -60,7 +60,7 @@ class SesManager(cmd.Cmd):
                          "(?P<subsysdevid>[^ ]+) *", ctrl)
             if m:
                 m = cleandict(m.groupdict(), "id")
-                self.controllers[m["id"]] = m
+                self._controllers[m["id"]] = m
 
     def discover_enclosures(self, *ctrls):
         """ Discover enclosure wired to controller. If no controller specified, discover them all """
@@ -76,7 +76,7 @@ class SesManager(cmd.Cmd):
                                  "Numslots +: (?P<numslot>[0-9]+)", tmp):
                 m = cleandict(m.groupdict(), "index", "numslot")
                 m["controller"] = ctrl
-                self.enclosures[m["id"]] = m
+                self._enclosures[m["id"]] = m
                 enclosures[m["index"]] = m
             # Discover Drives
             for m in re.finditer("Device is a Hard disk\n +"
@@ -169,7 +169,7 @@ class SesManager(cmd.Cmd):
     def do_disks(self, line):
         """Display detected disks. Use -v for verbose output"""
         list = [ ("%1d:%.2d:%.2d"%(v["controller"], v["enclosureindex"], v["slot"]), v)
-                 for k,v in self.disks.items() if k.startswith("/dev/rdsk") ]
+                 for k,v in self.disks.items() ]
         list.sort()
         if line == "-v":
             pprint (list)
