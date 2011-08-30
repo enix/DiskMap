@@ -200,9 +200,10 @@ class SesManager(cmd.Cmd):
         try:
             c, e = line.split(":", 1)
             c, e = long(c), long(e)
-            print c, e
+            print self.enclosures.values()
             tmp = [ v["id"].lower() for v in self.enclosures.values()
                     if v["controller"] == c and v["index"] == e ]
+            print "tmp", tmp
             if len(tmp) != 1: raise
             return tmp[0]
         except Exception, e:
