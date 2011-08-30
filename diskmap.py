@@ -37,7 +37,6 @@ class SesManager(cmd.Cmd):
         self._disks = {}
         self.aliases = {}
         self.prompt = "Diskmap> "
-        self.use_rawinput = False
 
     @property
     def disks(self):
@@ -236,12 +235,14 @@ class SesManager(cmd.Cmd):
         candidates.sort()
         print candidates
         return [ i for i in candidates if i.startswith(text) ]
+
     complete_ledoff = complete_ledon
-        
     def do_ledoff(self, line):
         """ Turn off locate led on parameters FIXME : syntax parameters"""
         self.ledparse(False, line)
 
+
+    complete_alias = complete_ledon
     def do_alias(self, line):
         """
         Used to set a name on a enclosure.
@@ -278,7 +279,7 @@ class SesManager(cmd.Cmd):
                 except Exception, e:
                     print "Tryed to find your enclosure by path but couldn't find it (%s)"%e
             self.do_save()
-        
+    
     
     def __str__(self):
         result = []
