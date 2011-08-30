@@ -247,9 +247,8 @@ class SesManager(cmd.Cmd):
         else:
             # Try to see if it's an enclosure
             target = self.get_enclosure(line)
-            print target
             if target:
-                targets = [ disk for disk in self.disks.values() if disk["enclosure"] == line ]
+                targets = [ disk for disk in self.disks.values() if disk["enclosure"] == target ]
             else:
                 # Try to see if it's a disk
                 targets = self.get_disk(line)
