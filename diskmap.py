@@ -110,9 +110,9 @@ class SesManager(cmd.Cmd):
         # Capitalize everything.
         tmp = [ (a.upper(), b.upper()) for a, b in tmp ]
         tmp = dict(tmp)
-        # Sometimes serial returned by prtconf and by sas2ircu are different. Mangle them
         for serial, device in tmp.items()[:]:
             serial = serial.strip()
+            # Sometimes serial returned by prtconf and by sas2ircu are different. Mangle them
             serial = serial.replace("WD-", "WD")
             device = "/dev/rdsk/c1t%sd0"%device
             if serial in self._disks:
@@ -234,7 +234,7 @@ class SesManager(cmd.Cmd):
             return None
 
     def do_drawletter(self, line):
-        """ Print a N on a 4x6 enclosure """
+        """ Print a char on a 4x6 enclosure """
         line = line.strip()
         if not line: return
         letters = { "N": [ 0, 1, 2, 3, 4, 5, 9, 10, 13, 14, 18, 19, 20, 21, 22, 23 ],
@@ -313,8 +313,11 @@ class SesManager(cmd.Cmd):
         if line.startswith("alias -r "):
             return [ i for i in self.aliases.keys() if i.startswith(text) ]
         if line.count(" ") >= 2:
-            return [ i for i in self.complete_ledon(text, line, begidx, endidx)
-                     if i not in self.aliases ]
+            result = []
+            result.append(self.enclosures.keys())
+            result.append([ "%(controller)s:%(enclosureindex)s"%e for e in self.enclosures.values() ])
+            return [ i for i in result if i.startswith(text) ]
+                        
     
     def __str__(self):
         result = []
