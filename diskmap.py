@@ -315,7 +315,7 @@ class SesManager(cmd.Cmd):
         if line.count(" ") >= 2:
             result = []
             result.append(self.enclosures.keys())
-            result.append([ "%(controller)s:%(enclosureindex)s"%e for e in self.enclosures.values() ])
+            result.append([ "%(controller)s:%(index)s"%e for e in self.enclosures.values() ])
             return [ i for i in result if i.startswith(text) ]
                         
     
