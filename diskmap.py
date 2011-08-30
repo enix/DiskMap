@@ -205,11 +205,16 @@ class SesManager(cmd.Cmd):
                         break
                 # Try to locate by path
                 try:
-                    c, e, s = line.split(":", 2)
-                    c, e, s = long(c), long(e), long(s)
+                    if line.count(":") == 1:
+                        c, e = line.split(":")
+                        c, e = long(c), long(e)
+                        s = None
+                    else:
+                        c, e, s = line.split(":", 2)
+                        c, e, s = long(c), long(e), long(s)
                     targets = [ disk for disk in self.disks.values()
                             if disk["controller"] == c and disk["enclosureindex"] == e
-                            and disk["slot"] == s ]
+                            and s != None and disk["slot"] == s ]
                 except:
                     pass
         if targets:
