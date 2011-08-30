@@ -248,11 +248,12 @@ class SesManager(cmd.Cmd):
             # Try to see if it's an enclosure
             target = self.get_enclosure(line)
             if target:
-                print "enclosure"
                 targets = [ disk for disk in self.disks.values() if disk["enclosure"] == line ]
             else:
                 # Try to see if it's a disk
+                print targets
                 targets = self.get_disk(line)
+                print targets
         if targets:
             pprint(targets)
             self.set_leds(targets, value)
