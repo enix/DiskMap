@@ -135,7 +135,8 @@ class SesManager(cmd.Cmd):
                                  "scan: (?P<scan>[^\n]*)\n *"
                                  "config: ?(?P<config>(.|\n)*)"
                                  ,pool):
-                print m.groupdict()
+                m = m.groupdict()
+                print m["config"]
             
         
     def set_leds(self, disks, value=True):
