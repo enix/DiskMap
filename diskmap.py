@@ -165,9 +165,10 @@ class SesManager(cmd.Cmd):
         
     def do_discover(self, line=""):
         """Perform discovery on host to populate controller, enclosures and disks """
-        self.discover_controllers()
-        self.discover_enclosures()
-        self.discover_mapping()
+        #self.discover_controllers()
+        #self.discover_enclosures()
+        #self.discover_mapping()
+        self.discover_zpool()
         self.do_save()
     do_refresh = do_discover
 
