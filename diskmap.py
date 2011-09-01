@@ -133,7 +133,7 @@ class SesManager(cmd.Cmd):
             for m in re.finditer(" (?P<pool>[^\n]+)\n *" # We've splitted on pool:, so our first word is the pool name
                                  "state: (?P<state>[^ ]+)\n *"
                                  "scan: (?P<scan>[^\n]*)\n *"
-                                 "config: ?(?P<config>.*)"
+                                 "config: ?(?P<config>(.|\n)*)"
                                  ,pool):
                 print m.groupdict()
             
