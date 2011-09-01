@@ -136,10 +136,16 @@ class SesManager(cmd.Cmd):
                                  "errors: (?P<errors>[^\n]*)"
                                  ,pool):
                 m = m.groupdict()
-                disks =  [ re.sub(" +", " ", line).strip() for line in m["config"].split("\n")
-                           if line and not "NAME" in line ]
-                for disk in disks:
+                #disks =  [ re.sub(" +", " ", line).strip() for line in m["config"].split("\n")
+                #           if line and not "NAME" in line ]
+                #for disk in disks:
+                #    print disk
+                for disk in re.finditer(" +(?P<name>[^ ]+) +(?P<state>[^ ]+) +"
+                                        "(?P<read>[^ ]+) +(?P<write>[^ ]+) +(?P<cksum>[^ ]+) +"):
+                    disk = disk.groupdict()
+                    if disk["name"] == "NAME": continue
                     print disk
+                
             
         
     def set_leds(self, disks, value=True):
