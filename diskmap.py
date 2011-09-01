@@ -7,6 +7,7 @@ cachefile = "/tmp/pouet"
 
 sas2ircu = "/usr/sbin/sas2ircu"
 prtconf = "/usr/sbin/prtconf"
+zpool = "/usr/sbin/zpool"
 
 def run(cmd, *args):
     args = tuple([ str(i) for i in args ])
@@ -123,6 +124,19 @@ class SesManager(cmd.Cmd):
             else:
                 print "Warning : Got the serial %s from prtconf, but can't find it in disk detected by sas2ircu (disk removed ?)"%serial
 
+    def discover_zpool(self):
+        """ Try to locate disk in current zpool configuration"""
+        pools = run(zpool, "status").split("pool:")
+        for pool in pools:
+            for m in re.finditer(" *"
+                                 "pool: (?P<pool>[^\n]+)\n *"
+                                 "state: (?P<state>[^ ]+)\n *"
+                                 "scan: (?P<scan>[^\n]*)\n *"
+                                 "config:[::space::]*"
+                                 ,pool):
+                print m.groupdict()
+            
+        
     def set_leds(self, disks, value=True):
         if isinstance(disks, dict):
             disks = disks.values()
@@ -189,7 +203,7 @@ class SesManager(cmd.Cmd):
             disk["readablesize"] = megabyze(disk["sizemb"]*1024*1024)
             totalsize += disk["sizemb"]*1024*1024
             print "%(path)s  %(device)23s  %(model)16s  %(readablesize)6s  %(state)s"%disk
-        print "Total Drive : %s   Total Capacity : %s"%(len(self.disks), megabyze(totalsize))
+        print "Drives : %s   Total Capacity : %s"%(len(self.disks), megabyze(totalsize))
 
 
     def get_enclosure(self, line):
