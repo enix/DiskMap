@@ -128,6 +128,7 @@ class SesManager(cmd.Cmd):
         """ Try to locate disk in current zpool configuration"""
         pools = run(zpool, "status").split("pool:")
         for pool in pools:
+            print len(pool)
             for m in re.finditer(" *"
                                  "pool: (?P<pool>[^\n]+)\n *"
                                  "state: (?P<state>[^ ]+)\n *"
