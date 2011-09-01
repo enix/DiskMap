@@ -129,7 +129,6 @@ class SesManager(cmd.Cmd):
         pools = run(zpool, "status").split("pool:")
         for pool in pools:
             if not pool.strip(): continue
-            print pool
             for m in re.finditer(" (?P<pool>[^\n]+)\n *" # We've splitted on pool:, so our first word is the pool name
                                  "state: (?P<state>[^ ]+)\n *"
                                  "scan: (?P<scan>[^\n]*)\n *"
