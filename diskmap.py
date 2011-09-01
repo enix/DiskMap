@@ -138,7 +138,7 @@ class SesManager(cmd.Cmd):
                 m = m.groupdict()
                 disks =  [ re.sub(" +", "", line) for line in m["config"].split("\n")
                            if line and not "NAME" in line ]
-                for disk in disks
+                for disk in disks:
                     print disk
             
         
