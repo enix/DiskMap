@@ -141,7 +141,7 @@ class SesManager(cmd.Cmd):
                 #for disk in disks:
                 #    print disk
                 for disk in re.finditer(" +(?P<name>[^ ]+) +(?P<state>[^ ]+) +"
-                                        "(?P<read>[^ ]+) +(?P<write>[^ ]+) +(?P<cksum>[^ ]+) +", m["config"]):
+                                        "(?P<read>[^ ]+) +(?P<write>[^ ]+) +(?P<cksum>[^ ]+) *\n", m["config"]):
                     disk = disk.groupdict()
                     if disk["name"] == "NAME": continue
                     print disk
