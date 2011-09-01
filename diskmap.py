@@ -140,8 +140,9 @@ class SesManager(cmd.Cmd):
                 #           if line and not "NAME" in line ]
                 #for disk in disks:
                 #    print disk
-                for disk in re.finditer(" +(?P<name>[^ ]+) +(?P<state>[^ ]+) +"
-                                        "(?P<read>[^ ]+) +(?P<write>[^ ]+) +(?P<cksum>[^\n]+)\n", m["config"]):
+                for disk in re.finditer(" +(?P<name>[^ \t]+) +(?P<state>[^ \t]+) +"
+                                        "(?P<read>[^ \t]+) +(?P<write>[^ \t]+) +"
+                                        "(?P<cksum>[^\n]+)\n", m["config"]):
                     disk = disk.groupdict()
                     if disk["name"] == "NAME": continue
                     print disk
