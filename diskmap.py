@@ -136,17 +136,16 @@ class SesManager(cmd.Cmd):
                                  "errors: (?P<errors>[^\n]*)"
                                  ,pool):
                 m = m.groupdict()
-                #disks =  [ re.sub(" +", " ", line).strip() for line in m["config"].split("\n")
-                #           if line and not "NAME" in line ]
-                #for disk in disks:
-                #    print disk
-                for disk in re.finditer(" +(?P<name>[^ \t]+) +(?P<state>[^ \t]+) +"
+                parent = []
+                for disk in re.finditer("(?P<ident> +)(?P<name>[^ \t]+) +(?P<state>[^ \t]+) +"
                                         "(?P<read>[^ \t]+) +(?P<write>[^ \t]+) +"
                                         "(?P<cksum>[^\n]+)\n", m["config"]):
                     disk = disk.groupdict()
                     if disk["name"] == "NAME": continue
-                    print disk
-                
+                    for label in ( "mirror", "log", "raid", "cache"):
+                        pass
+                    # Ici en fait on veut du recursif, pour gerer facilement le coté parent
+                                  
             
         
     def set_leds(self, disks, value=True):
