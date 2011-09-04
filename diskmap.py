@@ -150,7 +150,6 @@ class SesManager(cmd.Cmd):
                         disk["name"].startswith("cache")):
                         parent = disk["name"]
                         continue
-                    print disk["name"], m["pool"], parent
                     device = "/dev/rdsk/%s"%disk["name"]
                     self._disks[device]["zpool"] = self._disks[device].get("zpool", {})
                     self._disks[device]["zpool"][m["pool"]] = parent
@@ -376,7 +375,6 @@ class SesManager(cmd.Cmd):
                 if disk["enclosure"] == enclosure:
                     tmp = disk["device"].replace("/dev/rdsk/", "")
                     replacelist.append((tmp, "%s/%s%02d"%(tmp, alias, disk["slot"])))
-        print replacelist
         line = sys.stdin.readline()
         while line:
             for r, e in replacelist:
