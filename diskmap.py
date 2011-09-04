@@ -136,7 +136,7 @@ class SesManager(cmd.Cmd):
                                  ,pool):
                 m = m.groupdict()
                 parent = "stripped"
-                for disk in re.finditer("(?P<indent>[ \t]+)(?P<name>[^ \t]+)( +(?P<state>[^ \t]+) +"
+                for disk in re.finditer("(?P<indent>[ \t]+)(?P<name>[^ \t]+)( +(?P<state>[^ \t]+))?( +"
                                         "(?P<read>[^ \t]+) +(?P<write>[^ \t]+) +"
                                         "(?P<cksum>[^\n]+))?\n", m["config"]):
                     disk = disk.groupdict()
