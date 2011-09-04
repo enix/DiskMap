@@ -139,7 +139,7 @@ class SesManager(cmd.Cmd):
                 parent = ""
                 for disk in re.finditer("((?P<indent> +)(?P<name>[^ \t]+) +(?P<state>[^ \t]+) +"
                                         "(?P<read>[^ \t]+) +(?P<write>[^ \t]+) +"
-                                        "(?P<cksum>[^\n]+)|(?P<indent +)(?P<name>cache))\n", m["config"]):
+                                        "(?P<cksum>[^\n]+)|(?P<indent> +)(?P<name>cache))\n", m["config"]):
                     disk = disk.groupdict()
                     print disk
                     if not disk["name"]: continue
