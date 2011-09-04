@@ -140,6 +140,7 @@ class SesManager(cmd.Cmd):
                                         "(?P<read>[^ \t]+) +(?P<write>[^ \t]+) +"
                                         "(?P<cksum>[^\n]+))?\n", m["config"]):
                     disk = disk.groupdict()
+                    print disk
                     if not disk["name"] or disk["name"] in ("NAME", m["pool"]):
                         continue
                     if disk["name"][-4:-2] == "d0":
