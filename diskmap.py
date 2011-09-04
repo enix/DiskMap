@@ -327,17 +327,25 @@ class SesManager(cmd.Cmd):
         """
         Used to set a name on a enclosure.
         
-        Usage : alias key value
-                alias -r key
+        Usage : alias enclosure name
+                alias -r name
+                alias -r enclosure
         Without parameters : list current alias
         """
         if not line:
             pprint(self.aliases)
         elif line.startswith("-r"):
             junk, alias = line.split(" ",1)
-            del self.aliases[alias.strip()]
+            alias = alias.strip()
+            if alias in self.aliases:
+                del self.aliases[alias]
+            else:
+                # We have to do a reverse lookup to find it !
+                tmp = dict([ (v,k) for k,v in self.aliases.items() ])
+                if alias in tmp:
+                    del self.aliases[tmp[alias]]
         elif " " in line:
-            alias,target = line.split(" ",1)
+            target, alias = line.split(" ",1)
             alias = alias.strip()
             enclosure = self.get_enclosure(target.strip())
             if not enclosure:
@@ -348,7 +356,8 @@ class SesManager(cmd.Cmd):
 
     def complete_alias(self, text, line, begidx, endidx):
         if line.startswith("alias -r "):
-            return [ i for i in self.aliases.keys() if i.startswith(text) ]
+            return ([ i for i in self.aliases.keys() if i.startswith(text) ] +
+                    [ i for i in self.aliases.values() if i.startswith(text) ])
         if line.count(" ") >= 2:
             result = []
             result.extend(self.enclosures.keys())
@@ -360,7 +369,7 @@ class SesManager(cmd.Cmd):
             print "This command is not intented to be executed in interactive mode"
             return
         replacelist = []
-        for alias, enclosure in self.aliases.items():
+        for enclosure, alias in self.aliases.items():
             for disk in self.disks.values():
                 if disk["enclosure"] == enclosure:
                     tmp = disk["device"].replace("/dev/rdsk/", "")
