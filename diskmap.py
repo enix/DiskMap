@@ -160,8 +160,7 @@ class SesManager(cmd.Cmd):
                                         "(?P<read>[^ \t]+) +(?P<write>[^ \t]+) +"
                                         "(?P<cksum>[^\n]+))?\n", m["config"]):
                     disk = disk.groupdict()
-                    print disk
-                    if not disk["name"]: continue
+                    if not disk["name"] or disk["name"] == "NAME": continue
                     if disk["name"][-4:-2] == "d0":
                         disk["name"] = disk["name"][:-2]
                     if (disk["name"].startswith("mirror") or
@@ -170,7 +169,7 @@ class SesManager(cmd.Cmd):
                         disk["name"].startswith("cache")):
                         parent = disk["name"]
                         continue
-                    #print disk["name"], m["pool"], parent
+                    print disk["name"], m["pool"], parent
 
 
         
