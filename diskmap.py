@@ -355,7 +355,7 @@ class SesManager(cmd.Cmd):
             result.extend([ "%(controller)s:%(index)s"%e for e in self.enclosures.values() ])
             return [ i for i in result if i.startswith(text) ]
                         
-    def do_mangle(self):
+    def do_mangle(self, junk=""):
         if sys.stdin.isatty():
             print "This command is not intented to be executed in interactive mode"
             return
