@@ -153,7 +153,7 @@ class SesManager(cmd.Cmd):
                     print disk["name"], m["pool"], parent
                     device = "/dev/rdsk/%s"%disk["name"]
                     self._disks[device]["zpool"] = self._disks[device].get("zpool", {})
-                    self._disks[device]["zpool"].update(m["pool"], parent)
+                    self._disks[device]["zpool"][m["pool"]] = parent
         
     def set_leds(self, disks, value=True):
         if isinstance(disks, dict):
