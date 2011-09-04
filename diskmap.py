@@ -359,9 +359,14 @@ class SesManager(cmd.Cmd):
         if sys.stdin.isatty():
             print "This command is not intented to be executed in interactive mode"
             return
+        replacelist = []
+        for alias, enclosure in self.aliases.items():
+            replacelist.extend([ (k, "%s/%s"%(k,alias)) for k,v in self.disks.items() if v["enclosure"] == enclosure ]
         line = sys.stdin.readline()
         while line:
-            sys.stdout.write(line.replace("c1t500", "COUCOUGNETTE"))
+            for r, e in replacelist:
+                line = line.replace(r, e)
+            sys.stdout.write(line)
             sys.stdout.flush()
             line = sys.stdin.readline()
     
