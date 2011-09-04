@@ -144,9 +144,13 @@ class SesManager(cmd.Cmd):
                     if not disk["name"]: continue
                     if disk["name"][-4:-2] == "d0":
                         disk["name"] = disk["name"][:-2]
-                    for label in ( "mirror", "log", "raid", "cache"):
-                        if disk["name"].startswith(label):
-                            parent = disk["name"]
+                    if (disk["name"].startswith("mirror") or
+                        disk["name"].startswith("log") or
+                        disk["name"].startswith("raid") or
+                        disk["name"].startswith("cache")):
+                        parent = disk["name"]
+                        continue
+                            
                     print disk["name"], m["pool"], parent
 
         
