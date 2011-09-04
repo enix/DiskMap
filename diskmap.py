@@ -363,7 +363,8 @@ class SesManager(cmd.Cmd):
         for alias, enclosure in self.aliases.items():
             for disk in self.disks.values():
                 if disk["enclosure"] == enclosure:
-                    replacelist.append((disk["device"], "%s/%s"%(disk["device"], alias)))
+                    tmp = disk["device"].replace("/dev/rdsk/", "")
+                    replacelist.append((tmp, "%s/%s"%(tmp, alias)))
         print replacelist
         line = sys.stdin.readline()
         while line:
