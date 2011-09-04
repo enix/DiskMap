@@ -144,8 +144,7 @@ class SesManager(cmd.Cmd):
                     if disk["name"] == "NAME": continue
                     for label in ( "mirror", "log", "raid", "cache"):
                         pass
-                                  
-            
+                    print disk
         
     def set_leds(self, disks, value=True):
         if isinstance(disks, dict):
