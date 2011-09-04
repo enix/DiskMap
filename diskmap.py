@@ -14,6 +14,9 @@ def run(cmd, *args):
     return subprocess.Popen((cmd,) + args,
                             stdout=subprocess.PIPE).communicate()[0]
 
+def revert(mydict):
+    return dict([ (v,k) for k,v in mydict.items()])
+
 def cleandict(mydict, *toint):
     result = {}
     for k in mydict.keys():
@@ -231,8 +234,9 @@ class SesManager(cmd.Cmd):
 
     def get_enclosure(self, line):
         """ Try to find an enclosure """
-        if line in self.aliases:
-            line = self.aliases[line]
+        aliases = revert(self.aliases):
+        if line in aliases
+            line = aliases[line]
         if line in self.enclosures:
             return line
         if line.lower() in self.enclosures:
@@ -313,7 +317,7 @@ class SesManager(cmd.Cmd):
 
     def complete_ledon(self, text, line, begidx, endidx):
         candidates = [ "all", "ALL" ]
-        candidates.extend(self.aliases.keys())
+        candidates.extend(self.aliases.values())
         candidates.extend([ disk["device"].replace("/dev/rdsk/", "") for disk in self.disks.values() ])
         candidates.extend([ disk["serial"] for disk in self.disks.values() ])
         candidates.extend([ "%(controller)s:%(enclosureindex)s:%(slot)s"%disk for disk in self.disks.values() ])
@@ -344,7 +348,7 @@ class SesManager(cmd.Cmd):
                 del self.aliases[alias]
             else:
                 # We have to do a reverse lookup to find it !
-                tmp = dict([ (v,k) for k,v in self.aliases.items() ])
+                tmp = revert(self.aliases)
                 if alias in tmp:
                     del self.aliases[tmp[alias]]
             self.do_save()
