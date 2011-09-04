@@ -151,7 +151,7 @@ class SesManager(cmd.Cmd):
                         parent = disk["name"]
                         continue
                     print disk["name"], m["pool"], parent
-                    device = "/dev/rdsk/c1t%sd0"%device
+                    device = "/dev/rdsk/%s"%disk["name"]
                     self._disks[device]["zpool"] = self._disks[device].get("zpool", {})
                     self._disks[device]["zpool"].update(m["pool"], parent)
         
