@@ -131,7 +131,7 @@ class SesManager(cmd.Cmd):
             for m in re.finditer(" (?P<pool>[^\n]+)\n *" # We've splitted on pool:, so our first word is the pool name
                                  "state: (?P<state>[^ ]+)\n *"
                                  "(status: (?P<status>(.|\n)+)\n *)??"
-                                 "scan: (?P<scan>[^\n]*)\n *"
+                                 "scan: (?P<scan>(.|\n)*)\n *"
                                  "config: ?(?P<config>(.|\n)*)\n *"
                                  "errors: (?P<errors>[^\n]*)"
                                  ,pool):
@@ -139,7 +139,7 @@ class SesManager(cmd.Cmd):
                 parent = "stripped"
                 for disk in re.finditer("(?P<indent>[ \t]+)(?P<name>[^ \t]+)( +(?P<state>[^ \t]+) +)?("
                                         "(?P<read>[^ \t]+) +(?P<write>[^ \t]+) +"
-                                        "(?P<cksum>[^\n]+))?\n", m["config"]):
+                                        "(?P<cksum>[^\n]+))?([^\n]*)?\n", m["config"]):
                     disk = disk.groupdict()
                     if not disk["name"] or disk["name"] in ("NAME", m["pool"]):
                         continue
