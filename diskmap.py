@@ -388,6 +388,6 @@ if __name__ == "__main__":
     else:
         sm.preloop()
         sm.onecmd("mangle")
-        sm.postloop(
+        sm.postloop()
     
     
