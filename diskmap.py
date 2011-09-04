@@ -188,6 +188,9 @@ class SesManager(cmd.Cmd):
         
     def do_discover(self, line=""):
         """Perform discovery on host to populate controller, enclosures and disks """
+        self._enclosures = {}
+        self._controllers = {}
+        self._disks = {}
         self.discover_controllers()
         self.discover_enclosures()
         self.discover_mapping()
