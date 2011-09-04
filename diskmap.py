@@ -355,6 +355,13 @@ class SesManager(cmd.Cmd):
             result.extend([ "%(controller)s:%(index)s"%e for e in self.enclosures.values() ])
             return [ i for i in result if i.startswith(text) ]
                         
+    def do_mangle(self):
+        if sys.stdin.isatty():
+            print "This command is not intented to be executed in interactive mode"
+            return
+        while line = sys.stdin.read():
+            print line.replace("c1t500", "COUCOUGNETTE")
+
     
     def __str__(self):
         result = []
@@ -375,7 +382,11 @@ if __name__ == "__main__":
         sm.preloop()
         sm.onecmd(" ".join(sys.argv[1:]))
         sm.postloop()
-    else:
+    elif sys.stdin.isatty():
         sm.cmdloop()
+    else:
+        sm.preloop()
+        sm.onecmd("mangle")
+        sm.postloop(
     
     
