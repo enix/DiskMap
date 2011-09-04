@@ -139,7 +139,7 @@ class SesManager(cmd.Cmd):
                 parent = "stripped"
                 for disk in re.finditer("(?P<indent>[ \t]+)(?P<name>[^ \t]+)( +(?P<state>[^ \t]+) +)?("
                                         "(?P<read>[^ \t]+) +(?P<write>[^ \t]+) +"
-                                        "(?P<cksum>[^\n]+))?([^\n]*)?\n", m["config"]):
+                                        "(?P<cksum>[^\n]+))?(?<notes>[^\n]+)?\n", m["config"]):
                     disk = disk.groupdict()
                     if not disk["name"] or disk["name"] in ("NAME", m["pool"]):
                         continue
