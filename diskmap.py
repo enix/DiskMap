@@ -151,9 +151,10 @@ class SesManager(cmd.Cmd):
                         disk["name"].startswith("cache")):
                         parent = disk["name"]
                         continue
-                    device = "/dev/rdsk/%s"%disk["name"]
-                    self._disks[device]["zpool"] = self._disks[device].get("zpool", {})
-                    self._disks[device]["zpool"][m["pool"]] = parent
+                    if "/dev/rdsk" not in disk["name"]:
+                        disk["name"] = "/dev/rdsk/%s"%disk["name"]
+                    self._disks[disk["name"]]["zpool"] = self._disks[disk["name"]].get("zpool", {})
+                    self._disks[disk["name"]]["zpool"][m["pool"]] = parent
         
     def set_leds(self, disks, value=True):
         if isinstance(disks, dict):
