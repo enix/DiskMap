@@ -220,8 +220,9 @@ class SesManager(cmd.Cmd):
             disk["path"] = path
             disk["device"] = disk["device"].replace("/dev/rdsk/", "")
             disk["readablesize"] = megabyze(disk["sizemb"]*1024*1024)
+            disk["pzpool"] = " / ".join([ "%s: %s"%(k,v) for k,v in disk.get("zpool", {}).items() ])
             totalsize += disk["sizemb"]*1024*1024
-            print "%(path)s  %(device)23s  %(model)16s  %(readablesize)6s  %(state)s %(zpool)s"%disk
+            print "%(path)s  %(device)23s  %(model)16s  %(readablesize)6s  %(state)s %(pzpool)s"%disk
         print "Drives : %s   Total Capacity : %s"%(len(self.disks), megabyze(totalsize))
 
 
