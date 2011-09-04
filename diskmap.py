@@ -359,9 +359,10 @@ class SesManager(cmd.Cmd):
         if sys.stdin.isatty():
             print "This command is not intented to be executed in interactive mode"
             return
-        while line = sys.stdin.read():
+        line = sys.stdin.readline()
+        while line:
             print line.replace("c1t500", "COUCOUGNETTE")
-
+            line = sys.stdin.readline()
     
     def __str__(self):
         result = []
