@@ -137,9 +137,9 @@ class SesManager(cmd.Cmd):
                                  ,pool):
                 m = m.groupdict()
                 parent = ""
-                for disk in re.finditer("(?P<indent> +)(?P<name>[^ \t]+)( +(?P<state>[^ \t]+) +"
+                for disk in re.finditer("((?P<indent> +)(?P<name>[^ \t]+) +(?P<state>[^ \t]+) +"
                                         "(?P<read>[^ \t]+) +(?P<write>[^ \t]+) +"
-                                        "(?P<cksum>[^\n]+))?\n", m["config"]):
+                                        "(?P<cksum>[^\n]+)|(?P<indent +)(?P<name>cache))\n", m["config"]):
                     disk = disk.groupdict()
                     print disk
                     if not disk["name"]: continue
