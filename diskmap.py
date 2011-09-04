@@ -144,7 +144,6 @@ class SesManager(cmd.Cmd):
                     if disk["name"] == "NAME": continue
                     for label in ( "mirror", "log", "raid", "cache"):
                         pass
-                    # Ici en fait on veut du recursif, pour gerer facilement le coté parent
                                   
             
         
