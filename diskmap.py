@@ -234,8 +234,8 @@ class SesManager(cmd.Cmd):
 
     def get_enclosure(self, line):
         """ Try to find an enclosure """
-        aliases = revert(self.aliases):
-        if line in aliases
+        aliases = revert(self.aliases)
+        if line in aliases:
             line = aliases[line]
         if line in self.enclosures:
             return line
