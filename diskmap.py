@@ -137,6 +137,7 @@ class SesManager(cmd.Cmd):
                                  ,pool):
                 m = m.groupdict()
                 for line in m["config"].split("\n"):
+                    if not line.strip(): continue
                     print line
                 """
                 for disk in re.finditer("(?P<indent> +)(?P<name>[^ \t]+) +(?P<state>[^ \t]+) +"
