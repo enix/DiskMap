@@ -151,7 +151,7 @@ class SesManager(cmd.Cmd):
                         disk["name"].startswith("cache")):
                         parent = disk["name"]
                         continue
-                    print disk["name"], m["pool"], parent
+                    #print disk["name"], m["pool"], parent
 
 
         
