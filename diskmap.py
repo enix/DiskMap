@@ -358,7 +358,7 @@ class SesManager(cmd.Cmd):
         if line.startswith("alias -r "):
             return ([ i for i in self.aliases.keys() if i.startswith(text) ] +
                     [ i for i in self.aliases.values() if i.startswith(text) ])
-        if line.count(" ") >= 2:
+        if line.count(" ") == 1:
             result = []
             result.extend(self.enclosures.keys())
             result.extend([ "%(controller)s:%(index)s"%e for e in self.enclosures.values() ])
