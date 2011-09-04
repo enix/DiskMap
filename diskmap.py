@@ -353,7 +353,7 @@ class SesManager(cmd.Cmd):
             if not enclosure:
                 print "No such enclosure %s"%target.lower()
             else:
-                self.aliases[alias] = enclosure
+                self.aliases[enclosure] = alias
                 self.do_save()
 
     def complete_alias(self, text, line, begidx, endidx):
@@ -372,7 +372,6 @@ class SesManager(cmd.Cmd):
             return
         replacelist = []
         for enclosure, alias in self.aliases.items():
-            print enclosure, alias
             for disk in self.disks.values():
                 if disk["enclosure"] == enclosure:
                     tmp = disk["device"].replace("/dev/rdsk/", "")
