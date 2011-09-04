@@ -156,9 +156,9 @@ class SesManager(cmd.Cmd):
                     
                     
                 """
-                for disk in re.finditer("(?P<indent>[ \t]+)(?P<name>[^ \t]+) +(?P<state>[^ \t]+) +"
+                for disk in re.finditer("(?P<indent>[ \t]+)(?P<name>[^ \t]+)( +(?P<state>[^ \t]+) +"
                                         "(?P<read>[^ \t]+) +(?P<write>[^ \t]+) +"
-                                        "(?P<cksum>[^\n]+)\n", m["config"]):
+                                        "(?P<cksum>[^\n]+))?\n", m["config"]):
                     disk = disk.groupdict()
                     print disk
                     if not disk["name"]: continue
