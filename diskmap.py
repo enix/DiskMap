@@ -147,6 +147,7 @@ class SesManager(cmd.Cmd):
                     if (disk["name"].startswith("mirror") or
                         disk["name"].startswith("log") or
                         disk["name"].startswith("raid") or
+                        disk["name"].startswith("spare") or
                         disk["name"].startswith("cache")):
                         parent = disk["name"]
                         continue
