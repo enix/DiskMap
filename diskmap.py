@@ -157,6 +157,9 @@ class SesManager(cmd.Cmd):
                         continue
                     if "/dev/rdsk" not in disk["name"]:
                         disk["name"] = "/dev/rdsk/%s"%disk["name"]
+                    if disk["name"] not in self._disks:
+                        print "Warning : Got the disk %s from zpool status, but can't find it in disk detected by sas2ircu (disk removed ?)"%disk["name"]
+                        continue
                     self._disks[disk["name"]]["zpool"] = self._disks[disk["name"]].get("zpool", {})
                     self._disks[disk["name"]]["zpool"][m["pool"]] = parent
         
