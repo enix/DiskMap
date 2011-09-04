@@ -140,11 +140,11 @@ class SesManager(cmd.Cmd):
                                         "(?P<read>[^ \t]+) +(?P<write>[^ \t]+) +"
                                         "(?P<cksum>[^\n]+)\n", m["config"]):
                     disk = disk.groupdict()
-                    if not disk["label"]: continue
+                    if not disk["name"]: continue
                     #for label in ( "mirror", "log", "raid", "cache"):
                     #    pass
-                    if disk["label"][-4:-2] == "d0":
-                        disk["label"] = disk["label"][:-2]
+                    if disk["name"][-4:-2] == "d0":
+                        disk["name"] = disk["name"][:-2]
                     print disk
 
         
