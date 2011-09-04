@@ -70,7 +70,6 @@ class SesManager(cmd.Cmd):
             ctrls = self.controllers.keys()
         for ctrl in ctrls:
             tmp = run(sas2ircu, ctrl, "DISPLAY")
-            #tmp = file("/tmp/pouet.txt").read() # Test with Wraith__ setup
             enclosures = {}
             # Discover enclosures
             for m in re.finditer("Enclosure# +: (?P<index>[^ ]+)\n +"
@@ -137,30 +136,12 @@ class SesManager(cmd.Cmd):
                                  ,pool):
                 m = m.groupdict()
                 parent = "stripped"
-                """
-                for line in m["config"].split("\n"):
-                    stripped = line.strip()
-                    if (not stripped or
-                        stripped.startswith("NAME") or
-                        stripped.startswith(m["pool"])):
-                        continue
-                    disk = re.match("(?P<ident> +)(?P<name>[^ \t]+).*", line)
-                    if not disk: continue
-                    disk = disk.groupdict()
-                    if (disk["name"].startswith("mirror") or
-                        disk["name"].startswith("log") or
-                        disk["name"].startswith("raid") or
-                        disk["name"].startswith("cache")):
-                        parent = disk["name"]
-                        continue
-                    
-                    
-                """
                 for disk in re.finditer("(?P<indent>[ \t]+)(?P<name>[^ \t]+)( +(?P<state>[^ \t]+) +"
                                         "(?P<read>[^ \t]+) +(?P<write>[^ \t]+) +"
                                         "(?P<cksum>[^\n]+))?\n", m["config"]):
                     disk = disk.groupdict()
-                    if not disk["name"] or disk["name"] == "NAME": continue
+                    if not disk["name"] or disk["name"] in ("NAME", m["pool"]):
+                        continue
                     if disk["name"][-4:-2] == "d0":
                         disk["name"] = disk["name"][:-2]
                     if (disk["name"].startswith("mirror") or
@@ -170,8 +151,9 @@ class SesManager(cmd.Cmd):
                         parent = disk["name"]
                         continue
                     print disk["name"], m["pool"], parent
-
-
+                    device = "/dev/rdsk/c1t%sd0"%device
+                    self._disks[device]["zpool"] = self._disks[device].get("zpool", {})
+                    self._disks[device]["zpool"].update(m["pool"], parent)
         
     def set_leds(self, disks, value=True):
         if isinstance(disks, dict):
@@ -239,7 +221,7 @@ class SesManager(cmd.Cmd):
             disk["device"] = disk["device"].replace("/dev/rdsk/", "")
             disk["readablesize"] = megabyze(disk["sizemb"]*1024*1024)
             totalsize += disk["sizemb"]*1024*1024
-            print "%(path)s  %(device)23s  %(model)16s  %(readablesize)6s  %(state)s"%disk
+            print "%(path)s  %(device)23s  %(model)16s  %(readablesize)6s  %(state)s %(zpool)s"%disk
         print "Drives : %s   Total Capacity : %s"%(len(self.disks), megabyze(totalsize))
 
 
