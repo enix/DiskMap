@@ -183,9 +183,9 @@ class SesManager(cmd.Cmd):
         
     def do_discover(self, line=""):
         """Perform discovery on host to populate controller, enclosures and disks """
-        #self.discover_controllers()
-        #self.discover_enclosures()
-        #self.discover_mapping()
+        self.discover_controllers()
+        self.discover_enclosures()
+        self.discover_mapping()
         self.discover_zpool()
         self.do_save()
     do_refresh = do_discover
@@ -345,6 +345,7 @@ class SesManager(cmd.Cmd):
                 tmp = dict([ (v,k) for k,v in self.aliases.items() ])
                 if alias in tmp:
                     del self.aliases[tmp[alias]]
+            self.do_save()
         elif " " in line:
             target, alias = line.split(" ",1)
             alias = alias.strip()
