@@ -136,11 +136,27 @@ class SesManager(cmd.Cmd):
                                  "errors: (?P<errors>[^\n]*)"
                                  ,pool):
                 m = m.groupdict()
-                for line in m["config"].split("\n"):
-                    if not line.strip(): continue
-                    print line
+                parent = "stripped"
                 """
-                for disk in re.finditer("(?P<indent> +)(?P<name>[^ \t]+) +(?P<state>[^ \t]+) +"
+                for line in m["config"].split("\n"):
+                    stripped = line.strip()
+                    if (not stripped or
+                        stripped.startswith("NAME") or
+                        stripped.startswith(m["pool"])):
+                        continue
+                    disk = re.match("(?P<ident> +)(?P<name>[^ \t]+).*", line)
+                    if not disk: continue
+                    disk = disk.groupdict()
+                    if (disk["name"].startswith("mirror") or
+                        disk["name"].startswith("log") or
+                        disk["name"].startswith("raid") or
+                        disk["name"].startswith("cache")):
+                        parent = disk["name"]
+                        continue
+                    
+                    
+                """
+                for disk in re.finditer("(?P<indent>[ \t]+)(?P<name>[^ \t]+) +(?P<state>[^ \t]+) +"
                                         "(?P<read>[^ \t]+) +(?P<write>[^ \t]+) +"
                                         "(?P<cksum>[^\n]+)\n", m["config"]):
                     disk = disk.groupdict()
@@ -155,7 +171,7 @@ class SesManager(cmd.Cmd):
                         parent = disk["name"]
                         continue
                     #print disk["name"], m["pool"], parent
-                 """
+
 
         
     def set_leds(self, disks, value=True):
