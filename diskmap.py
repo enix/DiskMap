@@ -361,7 +361,7 @@ class SesManager(cmd.Cmd):
             return
         replacelist = []
         for alias, enclosure in self.aliases.items():
-            replacelist.extend([ (k, "%s/%s"%(k,alias)) for k,v in self.disks.items() if v["enclosure"] == enclosure ]
+            replacelist.extend([ (k, "%s/%s"%(k,alias)) for k,v in self.disks.items() if v["enclosure"] == enclosure ])
         line = sys.stdin.readline()
         while line:
             for r, e in replacelist:
