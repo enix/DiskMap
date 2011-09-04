@@ -192,6 +192,7 @@ class SesManager(cmd.Cmd):
 
     def do_save(self, line=cachefile):
         """Save data to cache file. Use file %s if not specified"""%cachefile
+        if not line: line = cachefile # Cmd pass a empty string
         pickle.dump((self.controllers, self.enclosures, self._disks, self.aliases), file(line, "w+"))
 
 
