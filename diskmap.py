@@ -361,7 +361,8 @@ class SesManager(cmd.Cmd):
             return
         line = sys.stdin.readline()
         while line:
-            print line.replace("c1t500", "COUCOUGNETTE")
+            sys.stdout.write(line.replace("c1t500", "COUCOUGNETTE"))
+            sys.stdout.flush()
             line = sys.stdin.readline()
     
     def __str__(self):
