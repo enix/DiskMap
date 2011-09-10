@@ -2,6 +2,10 @@
 
 import subprocess, re, os, sys, readline, cmd, pickle
 from pprint import pformat, pprint
+pj = os.path.join
+
+from socket import gethostname
+hostname = gethostname()
 
 cachefile = "/tmp/pouet"
 
@@ -10,6 +14,8 @@ prtconf = "/usr/sbin/prtconf"
 zpool = "/usr/sbin/zpool"
 
 def run(cmd, *args):
+    if not os.path.exists(cmd):
+        raise Exception("Executable %s not found, please provide absolute path"%cmd)
     args = tuple([ str(i) for i in args ])
     return subprocess.Popen((cmd,) + args,
                             stdout=subprocess.PIPE).communicate()[0]
@@ -54,10 +60,11 @@ class SesManager(cmd.Cmd):
     def controllers(self):
         return self._controllers
 
-    def discover_controllers(self):
+    def discover_controllers(self, fromstring=None):
         """ Discover controller present in the computer """
-        tmp = run(sas2ircu, "LIST")
-        tmp = re.findall("(\n +[0-9]+ +.*)", tmp)
+        if not fromstring:
+            fromstring = run(sas2ircu, "LIST")
+        tmp = re.findall("(\n +[0-9]+ +.*)", fromstring)
         for ctrl in tmp:
             ctrl = ctrl.strip()
             m = re.match("(?P<id>[0-9]) +(?P<adaptertype>[^ ].*[^ ]) +(?P<vendorid>[^ ]+) +"
@@ -67,17 +74,19 @@ class SesManager(cmd.Cmd):
                 m = cleandict(m.groupdict(), "id")
                 self._controllers[m["id"]] = m
 
-    def discover_enclosures(self, *ctrls):
-        """ Discover enclosure wired to controller. If no controller specified, discover them all """
+    def discover_enclosures(self, ctrls = None):
+        """ Discover enclosure wired to controller. Ctrls = { 0: 'sas2ircu output', 1: 'sas2ircu output', ...}"""
         if not ctrls:
-            ctrls = self.controllers.keys()
-        for ctrl in ctrls:
-            tmp = run(sas2ircu, ctrl, "DISPLAY")
+            tmp = {}
+            for ctrl in self.controllers.keys():
+                tmp[ctrl] = run(sas2ircu, ctrl, "DISPLAY")
+            ctrls = tmp
+        for ctrl, output in ctrls.items():
             enclosures = {}
             # Discover enclosures
             for m in re.finditer("Enclosure# +: (?P<index>[^ ]+)\n +"
                                  "Logical ID +: (?P<id>[^ ]+)\n +"
-                                 "Numslots +: (?P<numslot>[0-9]+)", tmp):
+                                 "Numslots +: (?P<numslot>[0-9]+)", output):
                 m = cleandict(m.groupdict(), "index", "numslot")
                 m["controller"] = ctrl
                 self._enclosures[m["id"].lower()] = m
@@ -94,18 +103,19 @@ class SesManager(cmd.Cmd):
                                  "Serial No +: (?P<serial>[^\n]+)\n +"
                                  "Protocol +: (?P<protocol>[^\n]+)\n +"
                                  "Drive Type +: (?P<drivetype>[^\n]+)\n"
-                                 , tmp):
+                                 , output):
                 m = cleandict(m.groupdict(), "enclosureindex", "slot", "sizemb", "sizesector")
                 m["enclosure"] = enclosures[m["enclosureindex"]]["id"]
                 m["controller"] = ctrl
                 self._disks[m["serial"]] = m
 
-    def discover_mapping(self):
+    def discover_mapping(self, fromstring=None):
         """ use prtconf to get real device name using disk serial """
-        tmp = run(prtconf, "-v")
+        if not fromstring:
+            fromstring = run(prtconf, "-v")
         # Do some ugly magic to get what we want
         # First, get one line per drive
-        tmp = tmp.replace("\n", "").replace("disk, instance", "\n")
+        tmp = fromstring.replace("\n", "").replace("disk, instance", "\n")
         # Then match with regex
         tmp = re.findall("name='inquiry-serial-no' type=string items=1 dev=none +value='([^']+)'"
                          ".*?"
@@ -126,9 +136,11 @@ class SesManager(cmd.Cmd):
             else:
                 print "Warning : Got the serial %s from prtconf, but can't find it in disk detected by sas2ircu (disk removed ?)"%serial
 
-    def discover_zpool(self):
+    def discover_zpool(self, fromstring=None):
         """ Try to locate disk in current zpool configuration"""
-        pools = run(zpool, "status").split("pool:")
+        if not fromstring:
+            fromstring = run(zpool, "status")
+        pools = fromstring.split("pool:")
         for pool in pools:
             if not pool.strip(): continue
             for m in re.finditer(" (?P<pool>[^\n]+)\n *" # We've splitted on pool:, so our first word is the pool name
@@ -194,10 +206,13 @@ class SesManager(cmd.Cmd):
         self._enclosures = {}
         self._controllers = {}
         self._disks = {}
-        self.discover_controllers()
-        self.discover_enclosures()
-        self.discover_mapping()
-        self.discover_zpool()
+        for a in ( "discover_controllers", "discover_enclosures",
+                   "discover_mapping", "discover_zpool" ):
+            try:
+                getattr(self, a)()
+            except Exception, e:
+                print "Got an error during %s discovery : %s"%(a,e)
+                print "Please run %s configdump and send the report to dev"%sys.argv[0]
         self.do_save()
     do_refresh = do_discover
 
@@ -298,6 +313,22 @@ class SesManager(cmd.Cmd):
         self.do_ledoff(e)
         self.set_leds([ disk for disk in self.disks.values()
                         if disk["slot"] in letters[letter] and disk["enclosure"] == e ], True)
+
+    def do_configdump(self, path):
+        if not path:
+            path = pj(".", "test-%s"%hostname)
+        if not os.path.exists(path):
+            os.makedirs(path)
+        tmp = run(sas2ircu, "LIST")
+        self.discover_controllers(tmp)
+        file(pj(path, "sas2ircu-list.txt"), "w").write(tmp)
+        for ctrl in self.controllers:
+            file(pj(path, "sas2ircu-%s-display.txt"%ctrl), "w").write(
+                run(sas2ircu, ctrl, "DISPLAY"))
+        file(pj(path, "ptrconf-v.txt"), "w").write(
+            run(prtconf, "-v"))
+        file(pj(path, "zpool-status.txt"), "w").write(
+            run(zpool, "status"))
 
     def ledparse(self, value, line):
         line = line.strip()
@@ -408,8 +439,8 @@ class SesManager(cmd.Cmd):
 
 
 if __name__ == "__main__":
-    if not os.path.isfile(sas2ircu):
-        sys.exit("Error, cannot find sas2ircu (%s)"%sas2ircu)
+    #if not os.path.isfile(sas2ircu):
+    #    sys.exit("Error, cannot find sas2ircu (%s)"%sas2ircu)
     sm = SesManager()
     if len(sys.argv) > 1:
         sm.preloop()
