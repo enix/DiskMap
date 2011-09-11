@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import subprocess, re, os, sys, readline, cmd, pickle
+import subprocess, re, os, sys, readline, cmd, pickle, glob
 from pprint import pformat, pprint
 pj = os.path.join
 
@@ -93,16 +93,16 @@ class SesManager(cmd.Cmd):
                 enclosures[m["index"]] = m
             # Discover Drives
             for m in re.finditer("Device is a Hard disk\n +"
-                                 "Enclosure # +: (?P<enclosureindex>[^\n]+)\n +"
-                                 "Slot # +: (?P<slot>[^\n]+)\n +"
-                                 "State +: (?P<state>[^\n]+)\n +"
-                                 "Size .in MB./.in sectors. +: (?P<sizemb>[^/]+)/(?P<sizesector>[^\n]+)\n +"
-                                 "Manufacturer +: (?P<manufacturer>[^\n]+)\n +"
-                                 "Model Number +: (?P<model>[^\n]+)\n +"
-                                 "Firmware Revision +: (?P<firmware>[^\n]+)\n +"
-                                 "Serial No +: (?P<serial>[^\n]+)\n +"
-                                 "Protocol +: (?P<protocol>[^\n]+)\n +"
-                                 "Drive Type +: (?P<drivetype>[^\n]+)\n"
+                                 "Enclosure # +: (?P<enclosureindex>[^\n]*)\n +"
+                                 "Slot # +: (?P<slot>[^\n]*)\n +"
+                                 "State +: (?P<state>[^\n]*)\n +"
+                                 "Size .in MB./.in sectors. +: (?P<sizemb>[^/]*)/(?P<sizesector>[^\n]*)\n +"
+                                 "Manufacturer +: (?P<manufacturer>[^\n]*)\n +"
+                                 "Model Number +: (?P<model>[^\n]*)\n +"
+                                 "Firmware Revision +: (?P<firmware>[^\n]*)\n +"
+                                 "Serial No +: (?P<serial>[^\n]*)\n +"
+                                 "Protocol +: (?P<protocol>[^\n]*)\n +"
+                                 "Drive Type +: (?P<drivetype>[^\n]*)\n"
                                  , output):
                 m = cleandict(m.groupdict(), "enclosureindex", "slot", "sizemb", "sizesector")
                 m["enclosure"] = enclosures[m["enclosureindex"]]["id"]
@@ -119,22 +119,22 @@ class SesManager(cmd.Cmd):
         # Then match with regex
         tmp = re.findall("name='inquiry-serial-no' type=string items=1 dev=none +value='([^']+)'"
                          ".*?"
-                         "name='client-guid' type=string items=1 *value='([^']+)'", tmp)
-        # Capitalize everything.
-        tmp = [ (a.upper(), b.upper()) for a, b in tmp ]
-        tmp = dict(tmp)
-        for serial, device in tmp.items()[:]:
-            serial = serial.strip()
+                         #"name='client-guid' type=string items=1 *value='([^']+)'"
+                         #".*?"
+                         "dev_link=(/dev/rdsk/c[^ ]*d0)s0", tmp)
+        # Capitalize serial an guid
+        for serial, device in tmp:
+            serial = serial.strip().upper()
             # Sometimes serial returned by prtconf and by sas2ircu are different. Mangle them
-            serial = serial.replace("WD-", "WD")
-            device = "/dev/rdsk/c1t%sd0"%device
+            if serial not in self._disks and serial.replace("-", "") in self._disks:
+                serial = serial.replace("-", "")
             if serial in self._disks:
                 # Add device name to disks
                 self._disks[serial]["device"] = device
                 # Add a reverse lookup
                 self._disks[device] = self._disks[serial]
             else:
-                print "Warning : Got the serial %s from prtconf, but can't find it in disk detected by sas2ircu (disk removed ?)"%serial
+                print "Warning : Got the serial %s from prtconf, but can't find it in disk detected by sas2ircu (disk removed/not on backplane ?)"%serial
 
     def discover_zpool(self, fromstring=None):
         """ Try to locate disk in current zpool configuration"""
@@ -152,8 +152,8 @@ class SesManager(cmd.Cmd):
                                  ,pool):
                 m = m.groupdict()
                 parent = "stripped"
-                for disk in re.finditer("(?P<indent>[ \t]+)(?P<name>[^ \t]+)( +(?P<state>[^ \t]+) +)?("
-                                        "(?P<read>[^ \t]+) +(?P<write>[^ \t]+) +"
+                for disk in re.finditer("(?P<indent>[ \t]+)(?P<name>[^ \t\n]+)( +(?P<state>[^ \t\n]+) +)?("
+                                        "(?P<read>[^ \t\n]+) +(?P<write>[^ \t\n]+) +"
                                         "(?P<cksum>[^\n]+))?(?P<notes>[^\n]+)?\n", m["config"]):
                     disk = disk.groupdict()
                     if not disk["name"] or disk["name"] in ("NAME", m["pool"]):
@@ -165,7 +165,7 @@ class SesManager(cmd.Cmd):
                         disk["name"].startswith("raid") or
                         disk["name"].startswith("spare") or
                         disk["name"].startswith("cache")):
-                        parent = disk["name"]
+                        parent = disk["name"].strip()
                         continue
                     if "/dev/rdsk" not in disk["name"]:
                         disk["name"] = "/dev/rdsk/%s"%disk["name"]
@@ -201,18 +201,40 @@ class SesManager(cmd.Cmd):
         return True
     do_EOF = do_quit
         
-    def do_discover(self, line=""):
-        """Perform discovery on host to populate controller, enclosures and disks """
+    def do_discover(self, configdir=""):
+        """Perform discovery on host to populate controller, enclosures and disks
+
+        Take an optionnal parameter which can be a directory containing files dumped
+        with confidump.
+        """
         self._enclosures = {}
         self._controllers = {}
         self._disks = {}
-        for a in ( "discover_controllers", "discover_enclosures",
+        if configdir and os.path.isdir(configdir):
+            # We wan't to load data from an other box for testing purposes
+            # So we don't want to catch any exception
+            files = os.listdir(configdir)
+            for f in ("prtconf-v.txt", "sas2ircu-0-display.txt", "sas2ircu-list.txt", "zpool-status.txt"):
+                if f not in files:
+                    print "Invalid confdir, lacking of %s"%f
+                    return
+            self.discover_controllers(file(pj(configdir, "sas2ircu-list.txt")).read())
+            files = glob.glob(pj(configdir, "sas2ircu-*-display.txt"))
+            tmp = {}
+            for name in files:
+                ctrlid = long(os.path.basename(name).split("-")[1])
+                tmp[ctrlid] = file(name).read()
+            self.discover_enclosures(tmp)
+            self.discover_mapping(file(pj(configdir, "prtconf-v.txt")).read())
+            self.discover_zpool(file(pj(configdir, "zpool-status.txt")).read())
+        else:
+            for a in ( "discover_controllers", "discover_enclosures",
                    "discover_mapping", "discover_zpool" ):
-            try:
-                getattr(self, a)()
-            except Exception, e:
-                print "Got an error during %s discovery : %s"%(a,e)
-                print "Please run %s configdump and send the report to dev"%sys.argv[0]
+                try:
+                    getattr(self, a)()
+                except Exception, e:
+                    print "Got an error during %s discovery : %s"%(a,e)
+                    print "Please run %s configdump and send the report to dev"%sys.argv[0]
         self.do_save()
     do_refresh = do_discover
 
@@ -224,7 +246,7 @@ class SesManager(cmd.Cmd):
 
     def do_load(self, line=cachefile):
         """Load data from cache file. Use file %s if not specified"""%cachefile
-        self.controllers, self.enclosures, self._disks, self.aliases = pickle.load(file(line))
+        self._controllers, self._enclosures, self._disks, self.aliases = pickle.load(file(line))
 
     def do_enclosures(self, line):
         """Display detected enclosures"""
@@ -316,7 +338,7 @@ class SesManager(cmd.Cmd):
 
     def do_configdump(self, path):
         if not path:
-            path = pj(".", "test-%s"%hostname)
+            path = pj(".", "configudump-%s"%hostname)
         if not os.path.exists(path):
             os.makedirs(path)
         tmp = run(sas2ircu, "LIST")
@@ -325,10 +347,11 @@ class SesManager(cmd.Cmd):
         for ctrl in self.controllers:
             file(pj(path, "sas2ircu-%s-display.txt"%ctrl), "w").write(
                 run(sas2ircu, ctrl, "DISPLAY"))
-        file(pj(path, "ptrconf-v.txt"), "w").write(
+        file(pj(path, "prtconf-v.txt"), "w").write(
             run(prtconf, "-v"))
         file(pj(path, "zpool-status.txt"), "w").write(
             run(zpool, "status"))
+        print "Dumped all value to path %s"%path
 
     def ledparse(self, value, line):
         line = line.strip()
@@ -435,6 +458,11 @@ class SesManager(cmd.Cmd):
             result.append(pformat(getattr(self,i)))
             result.append("")
         return "\n".join(result)
+
+
+import unittest
+class TestConfigs(unittest.TestCase):
+    pass
 
 
 
