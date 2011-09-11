@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+VERSION="0.1"
+
 import subprocess, re, os, sys, readline, cmd, pickle, glob
 from pprint import pformat, pprint
 pj = os.path.join
@@ -12,6 +14,7 @@ cachefile = "/tmp/pouet"
 sas2ircu = "/usr/sbin/sas2ircu"
 prtconf = "/usr/sbin/prtconf"
 zpool = "/usr/sbin/zpool"
+
 
 def run(cmd, *args):
     if not os.path.exists(cmd):
@@ -46,7 +49,7 @@ class SesManager(cmd.Cmd):
         self._controllers = {}
         self._disks = {}
         self.aliases = {}
-        self.prompt = "Diskmap> "
+        self.prompt = "Diskmap - %s> "%hostname
 
     @property
     def disks(self):
