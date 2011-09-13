@@ -292,7 +292,7 @@ class SesManager(cmd.Cmd):
             smartparams = params + [ disk["device"]+"p0" ]
             self.result.append(run(smartctl, *smartparams))
 
-    def do_smartcl_getstatus(self, disks):
+    def do_smartcl_getstatus(self, line):
         if line:
             raise NotImplemetedError
         else:
