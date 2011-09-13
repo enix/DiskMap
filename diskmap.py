@@ -14,7 +14,7 @@ cachefile = "/tmp/pouet"
 sas2ircu = "/usr/sbin/sas2ircu"
 prtconf = "/usr/sbin/prtconf"
 zpool = "/usr/sbin/zpool"
-
+smartctl = "/usr/local/sbin/smartctl"
 
 def run(cmd, *args):
     if not os.path.exists(cmd):
@@ -277,6 +277,18 @@ class SesManager(cmd.Cmd):
             print "%(path)s  %(device)23s  %(model)16s  %(readablesize)6s  %(state)s %(pzpool)s"%disk
         print "Drives : %s   Total Capacity : %s"%(len(self.disks), megabyze(totalsize))
 
+    def do_smartctl(self, line):
+        """ Execute smartctl on listed drive. If no drive selected, run it on all available drive. """
+        if line:
+            raise NotImplemetedError
+        else:
+            disks = self._disks.copy()
+        progress = xrange(1,len(disks)+1, 1).__iter__()
+        for disk in disks:
+            print "\rExecuting smartcl %s : %3d/%d"%(value, progress.next(),len(disks))
+            tmp = run(smartctl, "-a", "-d", "sat", disks["device"]+"p0")
+            print tmp.count("Error")
+        
 
     def get_enclosure(self, line):
         """ Try to find an enclosure """
