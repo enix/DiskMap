@@ -304,7 +304,7 @@ class SesManager(cmd.Cmd):
             smartoutput = re.sub("\n[ \t]+", " ", smartoutput)
             if "test failed" in smartoutput:
                 print "  Disk %s fail his last test"%disk["device"].replace("/dev/rdsk/", "")
-            zob= re.findall("(Self-test execution status [^\n]*?)", smartoutput)
+            zob= re.findall("(Self-test execution status.*)", smartoutput)
             if zob: print zob
 
     def do_smartcl_runtest(self, line):
