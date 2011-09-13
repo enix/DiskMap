@@ -285,7 +285,7 @@ class SesManager(cmd.Cmd):
             disks = self._disks.copy()
         progress = xrange(1,len(disks)+1, 1).__iter__()
         for disk in disks:
-            print "\rExecuting smartcl %s : %3d/%d"%(value, progress.next(),len(disks))
+            print "\rExecuting smartcl %s : %3d/%d"%(disk["path"], progress.next(),len(disks))
             tmp = run(smartctl, "-a", "-d", "sat", disks["device"]+"p0")
             print tmp.count("Error")
         
