@@ -300,7 +300,7 @@ class SesManager(cmd.Cmd):
         for (disk, smartoutput) in zip(disks, self.smartctl(disks)):
             self._disks[disk["device"]]["smartoutput"] = smartoutput
             if "test failed" in smartoutput:
-                print "  Disk %s fail his last test"disk["device"].replace("/dev/rdsk/", "")
+                print "  Disk %s fail his last test"%disk["device"].replace("/dev/rdsk/", "")
         
 
     def get_enclosure(self, line):
