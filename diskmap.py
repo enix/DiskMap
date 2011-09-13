@@ -293,6 +293,7 @@ class SesManager(cmd.Cmd):
             result.append(run(smartctl, *smartparams))
 
     def do_smartcl_getstatus(self, line):
+        # FIXME : line parsing
         if line:
             raise NotImplemetedError
         else:
@@ -301,7 +302,14 @@ class SesManager(cmd.Cmd):
             self._disks[disk["device"]]["smartoutput"] = smartoutput
             if "test failed" in smartoutput:
                 print "  Disk %s fail his last test"%disk["device"].replace("/dev/rdsk/", "")
-        
+
+    def do_smartcl_runtest(self, line):
+        # FIXME : line parsing
+        if line:
+            raise NotImplemetedError
+        else:
+            disks = self.disks.values()
+        self.smartctl(disks, action=test)
 
     def get_enclosure(self, line):
         """ Try to find an enclosure """
