@@ -291,6 +291,7 @@ class SesManager(cmd.Cmd):
                                                      progress.next(),len(disks)),
             smartparams = params + [ disk["device"]+"p0" ]
             result.append(run(smartctl, *smartparams))
+        return result
 
     def do_smartcl_getstatus(self, line):
         # FIXME : line parsing
