@@ -290,7 +290,7 @@ class SesManager(cmd.Cmd):
             print "\rExecuting smartcl on %s : %3d/%d"%(disk["device"].replace("/dev/rdsk/",""),
                                                      progress.next(),len(disks)),
             smartparams = params + [ disk["device"]+"p0" ]
-            self.result.append(run(smartctl, *smartparams))
+            result.append(run(smartctl, *smartparams))
 
     def do_smartcl_getstatus(self, line):
         if line:
