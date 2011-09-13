@@ -287,7 +287,7 @@ class SesManager(cmd.Cmd):
         for disk in disks.values():
             print "\rExecuting smartcl %s : %3d/%d"%(disk["device"].replace("/dev/rdsk/",""),
                                                      progress.next(),len(disks))
-            tmp = run(smartctl, "-a", "-d", "sat", disks["device"]+"p0")
+            tmp = run(smartctl, "-a", "-d", "sat", disk["device"]+"p0")
             print tmp.count("Error")
         
 
