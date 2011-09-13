@@ -277,18 +277,31 @@ class SesManager(cmd.Cmd):
             print "%(path)s  %(device)23s  %(model)16s  %(readablesize)6s  %(state)s %(pzpool)s"%disk
         print "Drives : %s   Total Capacity : %s"%(len(self.disks), megabyze(totalsize))
 
-    def do_smartctl(self, line):
+    def smartctl(self, disks, action="status"):
         """ Execute smartctl on listed drive. If no drive selected, run it on all available drive. """
+        params = [ "-s", "on", "-d", "sat" ]
+        if action == "status":
+            params += [ "-a" ]
+        elif action == "test":
+            params += [ "-t", "short" ]
+        result = []
+        progress = xrange(1,len(disks)+1, 1).__iter__()
+        for disk in disks:
+            print "\rExecuting smartcl on %s : %3d/%d"%(disk["device"].replace("/dev/rdsk/",""),
+                                                     progress.next(),len(disks)),
+            smartparams = params + [ disk["device"]+"p0" ]
+            self.result.append(run(smartctl, *smartparams))
+
+    def do_smartcl_getstatus(self, disks):
         if line:
             raise NotImplemetedError
         else:
-            disks = self.disks.copy()
-        progress = xrange(1,len(disks)+1, 1).__iter__()
-        for disk in disks.values():
-            print "\rExecuting smartcl on %s : %3d/%d"%(disk["device"].replace("/dev/rdsk/",""),
-                                                     progress.next(),len(disks)),
-            tmp = run(smartctl, "-a", "-d", "sat", disk["device"]+"p0")
-            self._disks[disk["device"]]["smartctl"] = tmp
+            disks = self.disks.values()
+        for (disk, smartoutput) in zip(disks, self.smartctl(disks)):
+            self._disks[disk["device"]]["smartoutput"] = smartoutput
+            if "test failed" in smartoutput:
+                print "  Disk %s fail his last test"disk["device"].replace("/dev/rdsk/", "")
+        
 
     def get_enclosure(self, line):
         """ Try to find an enclosure """
