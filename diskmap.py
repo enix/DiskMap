@@ -310,7 +310,7 @@ class SesManager(cmd.Cmd):
             raise NotImplemetedError
         else:
             disks = self.disks.values()
-        self.smartctl(disks, action=test)
+        self.smartctl(disks, action="test")
 
     def get_enclosure(self, line):
         """ Try to find an enclosure """
