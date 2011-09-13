@@ -285,10 +285,10 @@ class SesManager(cmd.Cmd):
             disks = self.disks.copy()
         progress = xrange(1,len(disks)+1, 1).__iter__()
         for disk in disks.values():
-            print "\rExecuting smartcl %s : %3d/%d"%(disk["device"].replace("/dev/rdsk/",""),
+            print "\rExecuting smartcl on %s : %3d/%d"%(disk["device"].replace("/dev/rdsk/",""),
                                                      progress.next(),len(disks)),
             tmp = run(smartctl, "-a", "-d", "sat", disk["device"]+"p0")
-        
+            self._disks[disk["device"]]["smartctl"] = tmp
 
     def get_enclosure(self, line):
         """ Try to find an enclosure """
