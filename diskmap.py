@@ -300,12 +300,15 @@ class SesManager(cmd.Cmd):
         else:
             disks = self.disks.values()
         for (disk, smartoutput) in zip(disks, self.smartctl(disks)):
-            self._disks[disk["device"]]["smartoutput"] = smartoutput
-            smartoutput = re.sub("\n[ \t]+", " ", smartoutput)
-            if "test failed" in smartoutput:
-                print "  Disk %s fail his last test"%disk["device"].replace("/dev/rdsk/", "")
-            zob= re.findall("(Self-test execution status.*)", smartoutput)
-            if zob: print zob
+            try:
+                self._disks[disk["device"]]["smartoutput"] = smartoutput
+                smartoutput = re.sub("\n[ \t]+", " ", smartoutput)
+                if "test failed" in smartoutput:
+                    print "  Disk %s fail his last test"%disk["device"].replace("/dev/rdsk/", "")
+                zob= re.findall("(Self-test execution status.*)", smartoutput)
+                if zob: print zob
+            except KeyError:
+                pass
 
     def do_smartcl_runtest(self, line):
         # FIXME : line parsing
