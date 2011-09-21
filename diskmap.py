@@ -17,7 +17,7 @@ zpool = "/usr/sbin/zpool"
 smartctl = "/usr/local/sbin/smartctl"
 mdb = "/usr/bin/mdb"
 
-def run(cmd, tostdin = "", *args):
+def run(cmd, *args, tostdin=""):
     if not os.path.exists(cmd):
         raise Exception("Executable %s not found, please provide absolute path"%cmd)
     args = tuple([ str(i) for i in args ])
