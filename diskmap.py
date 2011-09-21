@@ -15,8 +15,9 @@ sas2ircu = "/usr/sbin/sas2ircu"
 prtconf = "/usr/sbin/prtconf"
 zpool = "/usr/sbin/zpool"
 smartctl = "/usr/local/sbin/smartctl"
+mdb = "/usr/bin/mdb"
 
-def run(cmd, *args):
+def run(cmd, tostdin = "", *args):
     if not os.path.exists(cmd):
         raise Exception("Executable %s not found, please provide absolute path"%cmd)
     args = tuple([ str(i) for i in args ])
@@ -483,6 +484,13 @@ class SesManager(cmd.Cmd):
             return [ i for i in result if i.startswith(text) ]
                         
     def do_mangle(self, junk=""):
+        """ This function is automatically called when piping something to diskmap.
+
+        It'll suffix all drive name with the enclosure name they are in (defined with an
+        alias) and the drive slot.
+
+        Try : iostat -x -e -n 1 | diskmap.py
+        """
         if sys.stdin.isatty():
             print "This command is not intented to be executed in interactive mode"
             return
@@ -499,6 +507,18 @@ class SesManager(cmd.Cmd):
             sys.stdout.write(line)
             sys.stdout.flush()
             line = sys.stdin.readline()
+    def do_sd_timeout(self, newparam):
+        """ Get / Set sd timeout value
+
+        When no parameter is present, display the current sd_io_time, and check that running
+        drive use the same timing.
+        
+        This script will only change value for the running drive. If you wan't to apply change
+        permanently, put 'set sd:sd_io_time=5' in /etc/system
+
+        Be aware that the script will change the default value of sd_io_time, and also change
+        the current value for all drive in your system.
+        """
     
     def __str__(self):
         result = []
