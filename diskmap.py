@@ -536,7 +536,7 @@ class SesManager(cmd.Cmd):
                 return
         if not timeout:
             # Displaying current timeout
-            tmp = run(mdb, "-k", tosend="sd_io_time::print")
+            tmp = run(mdb, "-k", tosend="sd_io_time::print\n")
             globaltimeout = int(tmp.strip(), 16)
             print "Current Global sd_io_time : %s"%globaltimeout
             tmp = run(mdb, "-k", tosend="::walk sd_state | ::grep '.!=0' | "
