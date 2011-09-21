@@ -29,7 +29,12 @@ def revert(mydict):
 def cleandict(mydict, *toint):
     result = {}
     for k in mydict.keys():
-        result[k] = long(mydict[k]) if k in toint else mydict[k].strip()
+        if k in toint:
+            result[k] = long(mydict[k])
+        elif isinstance(mydict[k], str):
+            result[k] = mydict[k].strip()
+        else:
+            result[k] = mydict[k]
     return result
 
 def megabyze(i, fact=1000):
@@ -98,14 +103,14 @@ class SesManager(cmd.Cmd):
             for m in re.finditer("Device is a Hard disk\n +"
                                  "Enclosure # +: (?P<enclosureindex>[^\n]*)\n +"
                                  "Slot # +: (?P<slot>[^\n]*)\n +"
-                                 "SAS Address +: (?P<sasaddress>[^\n]*)\n +"
+                                 "(SAS Address +: (?P<sasaddress>[^\n]*)\n +)?"
                                  "State +: (?P<state>[^\n]*)\n +"
                                  "Size .in MB./.in sectors. +: (?P<sizemb>[^/]*)/(?P<sizesector>[^\n]*)\n +"
                                  "Manufacturer +: (?P<manufacturer>[^\n]*)\n +"
                                  "Model Number +: (?P<model>[^\n]*)\n +"
                                  "Firmware Revision +: (?P<firmware>[^\n]*)\n +"
                                  "Serial No +: (?P<serial>[^\n]*)\n +"
-                                 "GUID +: (?P<guid>[^\n]*)\n +"
+                                 "(GUID +: (?P<guid>[^\n]*)\n +)?"
                                  "Protocol +: (?P<protocol>[^\n]*)\n +"
                                  "Drive Type +: (?P<drivetype>[^\n]*)\n"
                                  , output):
