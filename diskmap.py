@@ -17,12 +17,21 @@ zpool = "/usr/sbin/zpool"
 smartctl = "/usr/local/sbin/smartctl"
 mdb = "/usr/bin/mdb"
 
-def run(cmd, *args, tostdin=""):
+def run(cmd, args, tosend=""):
+    if not isinstance(args, list):
+        args = [ args ]
     if not os.path.exists(cmd):
         raise Exception("Executable %s not found, please provide absolute path"%cmd)
     args = tuple([ str(i) for i in args ])
-    return subprocess.Popen((cmd,) + args,
-                            stdout=subprocess.PIPE).communicate()[0]
+    if tosend:
+        process = subprocess.Popen((cmd,) + args,
+                                   stdout=subprocess.PIPE,
+                                   stdin=subprocess.PIPE)
+        return process.communicate(tosend)[0]
+    else:
+        return subprocess.Popen((cmd,) + args,
+                                stdout=subprocess.PIPE).communicate()[0]
+    
 
 def revert(mydict):
     return dict([ (v,k) for k,v in mydict.items()])
@@ -88,7 +97,7 @@ class SesManager(cmd.Cmd):
         if not ctrls:
             tmp = {}
             for ctrl in self.controllers.keys():
-                tmp[ctrl] = run(sas2ircu, ctrl, "DISPLAY")
+                tmp[ctrl] = run(sas2ircu, [ctrl, "DISPLAY"])
             ctrls = tmp
         for ctrl, output in ctrls.items():
             enclosures = {}
@@ -193,7 +202,7 @@ class SesManager(cmd.Cmd):
         value = "on" if value else "off"
         for disk in disks:
             print "\rTurning leds %s : %3d/%d"%(value, progress.next(),len(disks)),
-            run(sas2ircu, disk["controller"], "LOCATE", "%(enclosureindex)s:%(slot)s"%disk, value)
+            run(sas2ircu, [disk["controller"], "LOCATE", "%(enclosureindex)s:%(slot)s"%disk, value])
         print
 
     def preloop(self):
@@ -298,7 +307,7 @@ class SesManager(cmd.Cmd):
             print "\rExecuting smartcl on %s : %3d/%d"%(disk["device"].replace("/dev/rdsk/",""),
                                                      progress.next(),len(disks)),
             smartparams = params + [ disk["device"]+"p0" ]
-            result.append(run(smartctl, *smartparams))
+            result.append(run(smartctl, smartparams))
         return result
 
     def do_smartcl_getstatus(self, line):
@@ -397,7 +406,7 @@ class SesManager(cmd.Cmd):
         file(pj(path, "sas2ircu-list.txt"), "w").write(tmp)
         for ctrl in self.controllers:
             file(pj(path, "sas2ircu-%s-display.txt"%ctrl), "w").write(
-                run(sas2ircu, ctrl, "DISPLAY"))
+                run(sas2ircu, [ctrl, "DISPLAY"]))
         file(pj(path, "prtconf-v.txt"), "w").write(
             run(prtconf, "-v"))
         file(pj(path, "zpool-status.txt"), "w").write(
