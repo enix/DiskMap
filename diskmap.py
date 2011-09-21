@@ -543,7 +543,7 @@ class SesManager(cmd.Cmd):
                       "::print -a struct sd_lun un_cmd_timeout\n")
             values = [ int(i, 16) for i in re.findall("= (0x[0-9a-f]+)", tmp) if i ]
             print "Got %s values from sd disk driver, %s are not equal to system default"%(
-                len(value), len(value)-value.count(globaltimeout))
+                len(values), len(values)-values.count(globaltimeout))
 
     
     def __str__(self):
