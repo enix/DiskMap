@@ -517,7 +517,8 @@ class SesManager(cmd.Cmd):
             sys.stdout.flush()
             line = sys.stdin.readline()
     def do_sd_timeout(self, timeout=""):
-        """ Get / Set sd timeout value
+        """
+        Get / Set sd timeout value
 
         When no parameter is present, display the current sd_io_time, and check that running
         drive use the same timing.
@@ -527,6 +528,8 @@ class SesManager(cmd.Cmd):
 
         Be aware that the script will change the default value of sd_io_time, and also change
         the current value for all drive in your system.
+
+        See : http://blogs.everycity.co.uk/alasdair/2011/05/adjusting-drive-timeouts-with-mdb-on-solaris-or-openindiana/
         """
         if timeout:
             try:
@@ -534,17 +537,24 @@ class SesManager(cmd.Cmd):
             except:
                 print "Invalid timeout specified"
                 return
-        if not timeout:
-            # Displaying current timeout
-            tmp = run(mdb, "-k", tosend="sd_io_time::print\n")
-            globaltimeout = int(tmp.strip(), 16)
-            print "Current Global sd_io_time : %s"%globaltimeout
-            tmp = run(mdb, "-k", tosend="::walk sd_state | ::grep '.!=0' | "
-                      "::print -a struct sd_lun un_cmd_timeout\n")
-            values = [ int(i, 16) for i in re.findall("= (0x[0-9a-f]+)", tmp) if i ]
-            print "Got %s values from sd disk driver, %s are not equal to system default"%(
-                len(values), len(values)-values.count(globaltimeout))
-
+        # Displaying current timeout
+        tmp = run(mdb, "-k", tosend="sd_io_time::print\n")
+        globaltimeout = int(tmp.strip(), 16)
+        print "Current Global sd_io_time : %s"%globaltimeout
+        drivestimeout = run(mdb, "-k", tosend="::walk sd_state | ::grep '.!=0' | "
+                            "::print -a struct sd_lun un_cmd_timeout\n")
+        values = [ int(i, 16) for i in re.findall("= (0x[0-9a-f]+)", drivestimeout) if i ]
+        print "Got %s values from sd disk driver, %s are not equal to system default"%(
+            len(values), len(values)-values.count(globaltimeout))
+        if timeout: # We want to set new timeout for drives
+            # Set global timeout
+            print "Setting global timeout ...",
+            run(mdb, "-kw", tosend="sd_io_time/W 0x%x\n"%timeout)
+            # Set timeout for every drive
+            for driveid in re.findall("(.+) un_cmd_timeout", drivestimeout):
+                print "\rSetting timeout for drive id %s ..."%driveid
+                run(mdb, "-kw", tosend="%s/W 0x%x\n"%(driveid, timeout))
+            print "Done"
     
     def __str__(self):
         result = []
