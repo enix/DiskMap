@@ -552,7 +552,7 @@ class SesManager(cmd.Cmd):
             run(mdb, "-kw", tosend="sd_io_time/W 0x%x\n"%timeout)
             # Set timeout for every drive
             for driveid in re.findall("(.+) un_cmd_timeout", drivestimeout):
-                print "\rSetting timeout for drive id %s ..."%driveid
+                print "\rSetting timeout for drive id %s ..."%driveid,
                 run(mdb, "-kw", tosend="%s/W 0x%x\n"%(driveid, timeout))
             print "Done"
     
