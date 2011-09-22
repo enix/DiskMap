@@ -555,6 +555,7 @@ class SesManager(cmd.Cmd):
                 print "\rSetting timeout for drive id %s ..."%driveid,
                 run(mdb, "-kw", tosend="%s/W 0x%x\n"%(driveid, timeout))
             print "Done"
+            print "Don't forget add to your /etc/system 'set sd:sd_io_time=%s' so change persit accross reboot"%timeout
     
     def __str__(self):
         result = []
