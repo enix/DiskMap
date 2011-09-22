@@ -323,7 +323,6 @@ class SesManager(cmd.Cmd):
                 if "test failed" in smartoutput:
                     print "  Disk %s fail his last test"%disk["device"].replace("/dev/rdsk/", "")
                 zob= re.findall("(Self-test execution status.*)", smartoutput)
-                if zob: print zob
             except KeyError:
                 pass
 
