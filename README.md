@@ -4,10 +4,11 @@ OpenSolaris/OpenIndiana utility to manage drive and map wmn device name (c1txxx)
 
 This script will hopefully make your life easier if you use ZFS on OpenSolaris/OpenIndiana with LSI controllers and some kind of backplane.
 
-It allows to:
+It can:
 
 * list connected drives, and see the mapping between wmn device name (c1txxx) and their physical location (controller, enclosure, slot);
-* 
+* turn the error led of a drive on and off (for easy identification of the drive in large enclosures with many disks);
+* be used as a pipe to enhance the output of programs like `iostat` to annotate disk information with the location of each disk.
 
 It's a work in progress. It works for me, but I don't have the time to polish or clean it up; so if you want to add your favourite feature or fix some nasty bug, feel free to contribute.
 
