@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+#-*- coding: utf-8 -*- 
 #
 #
 # Copyright (C) 2011 Sébastien Wacquiez
@@ -19,7 +20,7 @@
                                                 
 
 
-VERSION="0.11b"
+VERSION="0.11c"
 
 import subprocess, re, os, sys, readline, cmd, pickle, glob
 from pprint import pformat, pprint
