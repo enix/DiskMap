@@ -165,9 +165,13 @@ class SesManager(cmd.Cmd):
         # Capitalize serial an guid
         for serial, device in tmp:
             serial = serial.strip().upper()
-            # Sometimes serial returned by prtconf and by sas2ircu are different. Mangle them
+            # Sometimes serial returned by prtconf and by sas2ircu are different.
+            # First, try to mangle them (observed on WD disk)
             if serial not in self._disks and serial.replace("-", "") in self._disks:
                 serial = serial.replace("-", "")
+            # Then try to use just 8 first char (observed on Seagate Drive)
+            if serial not in self._disks and serial[:8] in self._disks:
+                serial = serial[:8]
             if serial in self._disks:
                 # Add device name to disks
                 self._disks[serial]["device"] = device
