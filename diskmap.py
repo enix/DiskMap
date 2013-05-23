@@ -20,7 +20,7 @@
                                                 
 
 
-VERSION="0.11c"
+VERSION="0.11d"
 
 import subprocess, re, os, sys, readline, cmd, pickle, glob
 from pprint import pformat, pprint
@@ -126,10 +126,21 @@ class SesManager(cmd.Cmd):
                                  "Logical ID +: (?P<id>[^ ]+)\n +"
                                  "Numslots +: (?P<numslot>[0-9]+)", output):
                 m = cleandict(m.groupdict(), "index", "numslot")
+                m["id"] = m["id"].lower()
+                
+                # Compute path, save ctrl
+                m["path"] = [ "%s:%s"%(ctrl,m["index"] ) ]
                 m["controller"] = ctrl
-                self._enclosures[m["id"].lower()] = m
-                enclosures[m["index"]] = m
-            # Discover Drives
+
+                # And if we already have this enclosure, just add it to the existing one, else save it
+                if m["id"] in self._enclosures:
+                    self._enclosures[m["id"]]["path"].extend(m["path"])
+                    enclosures[m["index"]] = self._enclosures[m["id"]]
+                else:
+                    self._enclosures[m["id"]] = m
+                    enclosures[m["index"]] = m
+                
+            # Discover Drives on each enclosure
             for m in re.finditer("Device is a Hard disk\n +"
                                  "Enclosure # +: (?P<enclosureindex>[^\n]*)\n +"
                                  "Slot # +: (?P<slot>[^\n]*)\n +"
@@ -145,12 +156,27 @@ class SesManager(cmd.Cmd):
                                  "Drive Type +: (?P<drivetype>[^\n]*)\n"
                                  , output):
                 m = cleandict(m.groupdict(), "enclosureindex", "slot", "sizemb", "sizesector")
+                # Some version of sas2ircu don't report GUID, so if we don't have it, replace it with the serial
                 m["enclosure"] = enclosures[m["enclosureindex"]]["id"]
-                m["controller"] = ctrl
-                self._disks[m["serial"]] = m
+                # Uppercase the serial number (I really don't know if it's a good idea ...)
+                m["serial"] = m["serial"].upper()
+                # Set the controller and full path. A device can be multiple attached
+                m["controller"] = [ ctrl ]
+                m["path"] = [ "%1d:%.2d:%.2d"%(ctrl, m["enclosureindex"], m["slot"]) ]
+                # If we already have this disk, just add the path to the existing object
+                if m["serial"] in self._disks:
+                    self._disks[m["serial"]]["path"].extend(m["path"])
+                    self._disks[m["serial"]]["controller"].extend(m["controller"])
+                else: # else save it
+                    self._disks[m["serial"]] = m
 
     def discover_mapping(self, fromstring=None):
-        """ use prtconf to get real device name using disk serial """
+        """
+        Use prtconf to get real device name using disk serial.
+        We should be able to use guid instead, but for some reason it's not reported
+        in standard way on the server I've access to.
+
+        """
         if not fromstring:
             fromstring = run(prtconf, "-v")
         # Do some ugly magic to get what we want
@@ -162,18 +188,25 @@ class SesManager(cmd.Cmd):
                          #"name='client-guid' type=string items=1 *value='([^']+)'"
                          #".*?"
                          "dev_link=(/dev/rdsk/c[^ ]*d0)s0", tmp)
-        # Capitalize serial an guid
         for serial, device in tmp:
+            # We use a upped serial.
             serial = serial.strip().upper()
             # Sometimes serial returned by prtconf and by sas2ircu are different.
-            # First, try to mangle them (observed on WD disk)
-            if serial not in self._disks and serial.replace("-", "") in self._disks:
-                serial = serial.replace("-", "")
-            # Then try to use just 8 first char (observed on Seagate Drive)
-            if serial not in self._disks and serial[:8] in self._disks:
-                serial = serial[:8]
+            if serial not in self._disks:
+                # First, try to mangle them (observed on WD disk)
+                if serial.replace("-", "") in self._disks:
+                    serial = serial.replace("-", "")
+                # Then try to use just 8 first char (observed on Seagate Drive)
+                elif serial[:8] in self._disks:
+                    serial = serial[:8]
+                # Then try to use just 8 last char (observed on some other WD disk)
+                elif serial[-8:] in self._disks:
+                    serial = serial[-8:]
             if serial in self._disks:
                 # Add device name to disks
+                if "device" in self._disks[serial]:
+                    print "Warning ! We have 2 device for disk %s : %s and %s"%(serial, self._disks[serial]["device"], device)
+                    print "Check your mutlipath settings (stmsboot -e and scsi-vhci-failover-override in /kernel/drv/scsi_vhci.conf"
                 self._disks[serial]["device"] = device
                 # Add a reverse lookup
                 self._disks[device] = self._disks[serial]
@@ -279,6 +312,7 @@ class SesManager(cmd.Cmd):
                 except Exception, e:
                     print "Got an error during %s discovery : %s"%(a,e)
                     print "Please run %s configdump and send the report to dev"%sys.argv[0]
+                    break
         self.do_save()
     do_refresh = do_discover
 
@@ -302,7 +336,7 @@ class SesManager(cmd.Cmd):
 
     def do_disks(self, line):
         """Display detected disks. Use -v for verbose output"""
-        list = [ ("%1d:%.2d:%.2d"%(v["controller"], v["enclosureindex"], v["slot"]), v)
+        list = [ (",".join(v["path"]), v)
                  for k,v in self.disks.items() ]
         list.sort()
         if line == "-v":
@@ -310,12 +344,13 @@ class SesManager(cmd.Cmd):
             return
         totalsize = 0
         for path, disk in list:
-            disk["path"] = path
+            disk["cpath"] = path
             disk["device"] = disk["device"].replace("/dev/rdsk/", "")
             disk["readablesize"] = megabyze(disk["sizemb"]*1024*1024)
             disk["pzpool"] = " / ".join([ "%s: %s"%(k,v) for k,v in disk.get("zpool", {}).items() ])
+            disk["alias"] = self.aliases.get(disk["enclosure"], disk["enclosure"]) + "/%02d"%disk["slot"]
             totalsize += disk["sizemb"]*1024*1024
-            print "%(path)s  %(device)23s  %(model)16s  %(readablesize)6s  %(state)s %(pzpool)s"%disk
+            print "{cpath}  {alias:<16} {device:<21}  {model:<16}  {readablesize:<6} {pzpool}".format(**disk)
         print "Drives : %s   Total Capacity : %s"%(len(self.disks), megabyze(totalsize))
 
     def smartctl(self, disks, action="status"):
@@ -398,10 +433,10 @@ class SesManager(cmd.Cmd):
                 c, e, s = tmp
                 c, e, s = long(c), long(e), long(s)
                 return [ disk for disk in self.disks.values()
-                         if disk["controller"] == c and disk["enclosureindex"] == e
+                         if c in disk["controller"] and disk["enclosureindex"] == e
                          and disk["slot"] == s ]
         except Exception, e:
-            #print e
+            print e
             return None
 
     def do_drawletter(self, line):
@@ -464,7 +499,8 @@ class SesManager(cmd.Cmd):
         candidates.extend(self.aliases.values())
         candidates.extend([ disk["device"].replace("/dev/rdsk/", "") for disk in self.disks.values() ])
         candidates.extend([ disk["serial"] for disk in self.disks.values() ])
-        candidates.extend([ "%(controller)s:%(enclosureindex)s:%(slot)s"%disk for disk in self.disks.values() ])
+        candidates.extend([ "%s:%s:%s"%(disk["controller"][0], disk["enclosureindex"], disk["slot"])
+                            for disk in self.disks.values() ])
         candidates.extend([ "%(controller)s:%(index)s"%enclosure for enclosure in self.enclosures.values() ] )
         candidates.sort()
         return [ i for i in candidates if i.startswith(text) ]
