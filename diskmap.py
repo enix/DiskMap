@@ -156,7 +156,6 @@ class SesManager(cmd.Cmd):
                                  "Drive Type +: (?P<drivetype>[^\n]*)\n"
                                  , output):
                 m = cleandict(m.groupdict(), "enclosureindex", "slot", "sizemb", "sizesector")
-                # Some version of sas2ircu don't report GUID, so if we don't have it, replace it with the serial
                 m["enclosure"] = enclosures[m["enclosureindex"]]["id"]
                 # Uppercase the serial number (I really don't know if it's a good idea ...)
                 m["serial"] = m["serial"].upper()
