@@ -478,19 +478,24 @@ class SesManager(cmd.Cmd):
             # And sort it per drive index
             disks[enclosure].sort(key=lambda a: a["slot"])
         # Now, iterate on each enclosures we get a print the drive device name
+        debug = []
+        result = []
         while True:
             # Use a temporary list so we don't print partial calculation
             tmp = [ text ]
+            debug.append(text)
             try:
                 for enclosure in enclosures:
                     # Get next disk
                     disk = disks[enclosure].pop(0)
                     # Add what we need
                     tmp.append(disk["device"].replace("/dev/rdsk/",""))
+                    debug.append(disk["path"][0])
             except IndexError:
                     break
-            print " ".join(tmp),
-        print
+            result.extend(tmp)
+        print "Debug with drive path : " + " ".join(debug)
+        print "C/C on your zpool create cmd line : " + " ".join(result)
         
 
     def do_drawletter(self, line):
