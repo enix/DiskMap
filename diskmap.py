@@ -498,13 +498,13 @@ class SesManager(cmd.Cmd):
         candidates.extend(self.aliases.values())
         candidates.extend([ disk["device"].replace("/dev/rdsk/", "") for disk in self.disks.values() ])
         candidates.extend([ disk["serial"] for disk in self.disks.values() ])
-        candidates.extend([ "%s:%s:%s"%(disk["controller"][0], disk["enclosureindex"], disk["slot"])
-                            for disk in self.disks.values() ])
+        candidates.extend([ "%s:%s:%s"%(ctrl, disk["enclosureindex"], disk["slot"])
+                            for disk in self.disks.values() for ctrl in disk["controller"] ])
         candidates.extend([ "%(controller)s:%(index)s"%enclosure for enclosure in self.enclosures.values() ] )
         candidates.sort()
         return [ i for i in candidates if i.startswith(text) ]
 
-    complete_ledoff = complete_ledon
+    complete_ledoff = complete_ledon    
     def do_ledoff(self, line):
         """ Turn off locate led on parameters FIXME : syntax parameters"""
         self.ledparse(False, line)
