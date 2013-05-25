@@ -20,7 +20,7 @@
                                                 
 
 
-VERSION="0.11d"
+VERSION="0.12"
 
 import subprocess, re, os, sys, readline, cmd, pickle, glob
 from pprint import pformat, pprint
@@ -438,6 +438,61 @@ class SesManager(cmd.Cmd):
             print e
             return None
 
+    def complete_enumerate(self, text, line, begidx, endidx):
+        if line.count(" ") > 1:
+            result = []
+            result.extend(self.enclosures.keys())
+            result.extend([ "%(controller)s:%(index)s"%e for e in self.enclosures.values() ])
+            result.extend(self.aliases.values())
+        else:
+            result = [ "mirror", "raidz1", "raidz2", "raidz3" ]
+        return [ i for i in result if i.startswith(text) ]
+
+    def do_enumerate(self, line):
+        """
+        Enumerate disks sequentially to help zpool creation.
+
+        Eg :
+        2 way mirror on 1 enclosures :
+        enumerate mirror backplane1 backplane1
+        mirror disk1_backplane1 disk2_backplane1 mirror disk3_backplane1 disk4_backplane1 [...]
+        
+        2 way mirror on 2 enclosures :
+        enumerate mirror [backplane1] [backplane2]
+        output :
+        mirror disk1_backplane1 disks1_backplane2 mirror disk2_backplane1 disk2_backplane2 [...]
+
+        enumerate raidz2 b1 b2 b1 b2 :
+        raidz2 d1_b1 d1_b2 d2_b1 d2_b2 raidz2 d3_b1 d3_b2 d4_b1 d4_b2 [...]
+        """
+        line = line.strip()
+        if not line: return
+        line = line.split()
+        text = line.pop(0)
+        # Get enclosure id for each parameters
+        enclosures = [ self.get_enclosure(i) for i in line ]
+        # Then build a list of drives for each enclosure
+        disks = {}
+        for enclosure in enclosures:
+            disks[enclosure] = [ disk for disk in self.disks.values() if disk["enclosure"] == enclosure ]
+            # And sort it per drive index
+            disks[enclosure].sort(key=lambda a: a["slot"])
+        # Now, iterate on each enclosures we get a print the drive device name
+        while True:
+            # Use a temporary list so we don't print partial calculation
+            tmp = [ text ]
+            try:
+                for enclosure in enclosures:
+                    # Get next disk
+                    disk = disks[enclosure].pop(0)
+                    # Add what we need
+                    tmp.append(disk["device"].replace("/dev/rdsk/",""))
+            except IndexError:
+                    break
+            print " ".join(tmp),
+        print
+        
+
     def do_drawletter(self, line):
         """ Print a char on a 4x6 enclosure """
         line = line.strip()
@@ -575,6 +630,7 @@ class SesManager(cmd.Cmd):
             sys.stdout.write(line)
             sys.stdout.flush()
             line = sys.stdin.readline()
+
     def do_sd_timeout(self, timeout=""):
         """
         Get / Set sd timeout value
