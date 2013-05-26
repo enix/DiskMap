@@ -440,6 +440,7 @@ class SesManager(cmd.Cmd):
 
     def complete_enumerate(self, text, line, begidx, endidx):
         if line.count(" ") > 1:
+            # FIXME Only use enclosure with drive attached ...
             result = []
             result.extend(self.enclosures.keys())
             result.extend([ "%(controller)s:%(index)s"%e for e in self.enclosures.values() ])
@@ -495,7 +496,7 @@ class SesManager(cmd.Cmd):
                     break
             result.extend(tmp)
         print "Debug with drive path : " + " ".join(debug)
-        print "C/C on your zpool create cmd line : " + " ".join(result)
+        print "C/C this in your zpool create cmd line : " + " ".join(result)
         
 
     def do_drawletter(self, line):
