@@ -20,7 +20,7 @@
                                                 
 
 
-VERSION="0.12"
+VERSION="0.12a"
 
 import subprocess, re, os, sys, readline, cmd, pickle, glob
 from pprint import pformat, pprint
@@ -258,7 +258,7 @@ class SesManager(cmd.Cmd):
         value = "on" if value else "off"
         for disk in disks:
             print "\rTurning leds %s : %3d/%d"%(value, progress.next(),len(disks)),
-            run(sas2ircu, [disk["controller"], "LOCATE", "%(enclosureindex)s:%(slot)s"%disk, value])
+            run(sas2ircu, [disk["controller"][0], "LOCATE", "%(enclosureindex)s:%(slot)s"%disk, value])
         print
 
     def preloop(self):
