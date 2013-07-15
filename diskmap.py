@@ -20,7 +20,7 @@
                                                 
 
 
-VERSION="0.12b"
+VERSION="0.12a"
 
 import subprocess, re, os, sys, readline, cmd, pickle, glob
 from pprint import pformat, pprint
