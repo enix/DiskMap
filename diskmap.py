@@ -276,6 +276,11 @@ class SesManager(cmd.Cmd):
         "Quit"
         return True
     do_EOF = do_quit
+
+    def complete_discover(self, text, line, begidx, endidx):
+        # Basic completion, cannot list anyting else than the current rep
+        candidates = [ i for i in os.listdir(".") if os.path.isdir(i) ]
+        return [ i for i in candidates if i.startswith(text) ]
         
     def do_discover(self, configdir=""):
         """Perform discovery on host to populate controller, enclosures and disks
@@ -496,24 +501,7 @@ class SesManager(cmd.Cmd):
                     break
             result.extend(tmp)
         print "Debug with drive path : " + " ".join(debug)
-        print "C/C this in your zpool create cmd line : " + " ".join(result)
-        
-
-    def do_drawletter(self, line):
-        """ Print a char on a 4x6 enclosure """
-        line = line.strip()
-        if not line: return
-        letters = { "N": [ 0, 1, 2, 3, 4, 5, 9, 10, 13, 14, 18, 19, 20, 21, 22, 23 ],
-                   "X": [ 0, 1, 4, 5, 8, 9, 14, 15, 18 , 19, 22, 23 ],
-                   # FIXME Ajouter les chiffres
-                   }
-        letter, enclosure = line.split(" ",1)
-        e = self.get_enclosure(enclosure)
-        if not e:
-            print "Invalid enclosure %s"%e
-        self.do_ledoff(e)
-        self.set_leds([ disk for disk in self.disks.values()
-                        if disk["slot"] in letters[letter] and disk["enclosure"] == e ], True)
+        print "C/C this in your zpool create cmd line : " + " ".join(result)        
 
     def do_configdump(self, path):
         if not path:
