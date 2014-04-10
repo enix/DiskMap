@@ -209,3 +209,9 @@ Example (assuming the aliases defined above):
 
 See how BCK and FNT (as well as drive number in the enclosure) has been added to the output.
 
+# Know Limitation
+
+At the day of writing, sas2ircu refuse to list your devices if you have more than 256 devices.
+
+Multipath of enclosure sometime have multiple sas address. It should be easy to fix, but I didn't found any document which explain why it change and how much it can change, so right now diskmap don't handle it.
+
