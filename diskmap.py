@@ -22,7 +22,12 @@
 
 VERSION="0.12b"
 
-import subprocess, re, os, sys, readline, cmd, pickle, glob
+import subprocess, re, os, sys, cmd, pickle, glob
+
+try:
+    import readline
+except ImportError:
+    pass
 from pprint import pformat, pprint
 pj = os.path.join
 
@@ -201,6 +206,9 @@ class SesManager(cmd.Cmd):
                 # Then try to use just 8 last char (observed on some other WD disk)
                 elif serial[-8:] in self._disks:
                     serial = serial[-8:]
+                # Then try to add "WD" in front of the serial (observed on WD disk)
+                elif "WD"+serial in self._disks:
+                    serial = "WD"+serial
             if serial in self._disks:
                 # Add device name to disks
                 if "device" in self._disks[serial]:
